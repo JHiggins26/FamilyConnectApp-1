@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_Login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.jawanhiggins.familyconnect.LoginActivity"
+    android:weightSum="1">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/profileSection"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp">
+
+        <ImageView
+            android:id="@+id/blueBGimage"
+            android:background="#0c59cf"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/grayBGimage">
+        </ImageView>
+
+
+        <ImageView
+        android:id="@+id/grayBGimage"
+        android:background="#ebebeb"
+        android:layout_width="match_parent"
+        android:layout_height="325dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentEnd="true">
+
+        </ImageView>
+
+        <TextView
+            android:id="@+id/lTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Family Connect"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="60dp"
+            android:fontFamily="cursive"
+            android:layout_marginTop="18dp" />
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="450dp" />
+
+
+
+
+        <!--<RelativeLayout-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="275dp"-->
+        <!--tools:layout_constraintRight_creator="1"-->
+        <!--tools:layout_constraintBottom_creator="1"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--tools:layout_constraintLeft_creator="1"-->
+        <!--android:layout_marginBottom="40dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--android:id="@+id/relativeLayout5">-->
+
+
+        <!--<LinearLayout-->
+        <!--android:id="@+id/linearLayout1"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:layout_marginLeft="10dp"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:background="#ffffff"-->
+        <!--android:orientation="vertical"-->
+        <!--&gt;-->
+
+
+        <!--<EditText-->
+        <!--android:id="@+id/username"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="55dp"-->
+        <!--android:ems="10"-->
+        <!--android:hint="Username"-->
+        <!--android:inputType="textPersonName"-->
+        <!--android:textColor="#000000"-->
+        <!--android:textColorHint="#aaaaaa"-->
+        <!--android:visibility="visible"-->
+        <!--tools:layout_editor_absoluteX="16dp"-->
+        <!--tools:layout_editor_absoluteY="270dp" />-->
+
+        <!--<EditText-->
+        <!--android:id="@+id/password"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="55dp"-->
+        <!--android:ems="10"-->
+        <!--android:hint="Password"-->
+        <!--android:inputType="textPersonName"-->
+        <!--android:textColor="#000000"-->
+        <!--android:textColorHint="#aaaaaa"-->
+        <!--android:visibility="visible"-->
+        <!--tools:layout_editor_absoluteX="16dp"-->
+        <!--tools:layout_editor_absoluteY="270dp" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/lRememberMe"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="22dp"-->
+        <!--android:text="Remember me"-->
+        <!--android:textColor="#000000"-->
+        <!--tools:layout_editor_absoluteX="16dp"-->
+        <!--tools:layout_editor_absoluteY="351dp"-->
+        <!--tools:layout_marginLeft="10dp"-->
+        <!--tools:layout_marginTop="10dp"/>-->
+
+        <!--<CheckBox-->
+        <!--android:id="@+id/lcheckBox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--tools:layout_editor_absoluteX="135dp"-->
+        <!--tools:layout_editor_absoluteY="343dp"-->
+        <!--tools:layout_marginLeft="10dp" />-->
+
+        <!--<Button-->
+        <!--android:id="@+id/lLoginButton"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Login"-->
+        <!--android:textColor="#ffffff"-->
+        <!--android:background="#1565c0"-->
+        <!--tools:layout_editor_absoluteX="8dp"-->
+        <!--tools:layout_editor_absoluteY="393dp"-->
+        <!--tools:layout_gravity="center"/>-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/lRegister"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="22dp"-->
+        <!--android:text="Not a User? Create Account"-->
+        <!--android:textColor="#1464f6"-->
+        <!--android:textAlignment="center"-->
+        <!--tools:layout_editor_absoluteX="16dp"-->
+        <!--tools:layout_editor_absoluteY="351dp"-->
+        <!--tools:layout_gravity="center"-->
+        <!--tools:layout_marginTop="10dp"-->
+        <!--tools:layout_marginBottom="10dp"/>-->
+
+        <!--</LinearLayout>-->
+
+        <!--</RelativeLayout>-->
+
+
+
+    </RelativeLayout>
+</RelativeLayout>
