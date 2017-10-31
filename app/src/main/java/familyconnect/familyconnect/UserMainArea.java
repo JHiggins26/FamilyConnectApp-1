@@ -118,7 +118,7 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
                 taskPut.execute(uriPut);
                 GET = false;
                 POST = false;
-                PUT = true;
+                PUT = true;  
                 break;
 
             case R.id.post_button:
