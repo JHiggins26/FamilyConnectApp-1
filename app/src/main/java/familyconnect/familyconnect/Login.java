@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -82,19 +83,25 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
 
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
+
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            accountEmail = acct.getEmail();
-            realName = acct.getGivenName();
-            displayName = acct.getDisplayName();
-            picURL = acct.getPhotoUrl().toString();
-            String authCode = acct.getServerAuthCode();
+
+            try {
+                accountEmail = acct.getEmail();
+                realName = acct.getGivenName();
+                displayName = acct.getDisplayName();
+                picURL = acct.getPhotoUrl().toString();
+                String authCode = acct.getServerAuthCode();
+            }catch (NullPointerException npe) {
+                picURL = "https://developers.google.com/experts/img/user/user-default.png";
+            }
 
             sharedPreferences = getSharedPreferences("USER_ATTRIBUTES", MODE_PRIVATE);
             editor = sharedPreferences.edit();
             editor.putBoolean("isLogin", true);
             editor.putString("name", realName);
-            editor.putString("email",accountEmail);
+            editor.putString("email", accountEmail);
             editor.putString("picture", picURL);
             editor.commit();
 
@@ -112,6 +119,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
+            Log.v("SIGN","SIGNED IN");
             result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
