@@ -125,6 +125,9 @@ fabric.properties
 # Json config
 app/google-services.json
 
+#dont track .idea files
+.idea/*
+
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
