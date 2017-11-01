@@ -127,6 +127,7 @@ app/google-services.json
 
 #dont track .idea files
 .idea/*
+.idea
 
 ### AndroidStudio Patch ###
 
