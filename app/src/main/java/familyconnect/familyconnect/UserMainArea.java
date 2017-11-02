@@ -70,11 +70,11 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
 
     private TextView name, email;
     private ImageView picture;
-    private Button buttonLogout, buttonFetch, buttonPost, buttonPut, buttonDelete;
+    private Button buttonLogout, buttonFetch, buttonPost, buttonPut, buttonDelete, buttonActivity;
     private GoogleApiClient mGoogleApiClient;
     private SharedPreferences prefs;
     private static boolean GET, POST, PUT, DELETE = false;
-    RequestQueue queue;
+    private RequestQueue queue;
 
 
     @Override
@@ -87,6 +87,7 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
         //Retrieve Data from GOOGLE Sign In
         prefs = getSharedPreferences("USER_ATTRIBUTES", MODE_PRIVATE);
 
+        buttonActivity = (Button) findViewById(R.id.activity_button);
         buttonDelete = (Button) findViewById(R.id.delete_button);
         buttonPut = (Button) findViewById(R.id.put_button);
         buttonPost = (Button) findViewById(R.id.post_button);
@@ -101,6 +102,7 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
         picture = (ImageView) findViewById(R.id.profilePic);
         Glide.with(this).load(prefs.getString("picture","")).into(picture);
 
+        buttonActivity.setOnClickListener(this);
         buttonPut.setOnClickListener(this);
         buttonPost.setOnClickListener(this);
         buttonFetch.setOnClickListener(this);
@@ -125,6 +127,12 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         switch (v.getId()) {
+
+            case R.id.activity_button:
+                Intent createActivitiesPage = new Intent(UserMainArea.this, GroupedActivities.class);
+                UserMainArea.this.startActivity(createActivitiesPage);
+                break;
+
             case R.id.sign_out_button:
                 signOut();
                 revokeAccess();

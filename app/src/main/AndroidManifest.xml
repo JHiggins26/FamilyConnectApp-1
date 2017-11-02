@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="familyconnect.familyconnect">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +19,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".UserMainArea" />
+        <activity
+            android:name=".CreateActivities"
+            android:label="@string/title_activity_create_activities"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GroupedActivities"
+            android:label="@string/title_activity_grouped_activities"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Welcome"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
