@@ -112,10 +112,6 @@ public class GroupedActivities extends AppCompatActivity {
                     DisplayActivitiesTab tab2 = new DisplayActivitiesTab();
 
                     return tab2;
-                case 2:
-                    GroupedActivitiesTab tab3 = new GroupedActivitiesTab();
-
-                    return tab3;
 
                 default:
                     return null;
@@ -124,8 +120,8 @@ public class GroupedActivities extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            // Switched view to two tabs
+            return 2;
         }
 
         @Override
@@ -135,8 +131,6 @@ public class GroupedActivities extends AppCompatActivity {
                     return "Create Activity";
                 case 1:
                     return "Activities";
-                case 2:
-                    return "Activity Groups";
             }
             return null;
         }

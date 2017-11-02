@@ -94,9 +94,9 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="0dp"
-                android:text="Create User"
                 android:background="#0c59cf"
-                android:textColor="#ffffff"/>
+                android:text="TempUserButton"
+                android:textColor="#ffffff" />
 
             <Button
                 android:id="@+id/buttonDashboard"
@@ -105,9 +105,9 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:text="Dashboard"
                 android:background="#5cb85c"
-                android:textColor="#ffffff"/>
+                android:text="My User Profile"
+                android:textColor="#ffffff" />
 
             <Button
                 android:id="@+id/sign_out_button"
