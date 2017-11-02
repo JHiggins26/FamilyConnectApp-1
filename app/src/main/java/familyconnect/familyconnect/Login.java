@@ -2,11 +2,21 @@ package familyconnect.familyconnect;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -14,6 +24,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
+import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
 
 /**
@@ -28,9 +50,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
     private String realName;
     private String displayName;
     private String picURL;
+    private boolean POST = false;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private RequestQueue queue;
 
     private static int RC_SIGN_IN = 9001;
 
@@ -38,6 +62,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        queue = Volley.newRequestQueue(this);
 
         buttonLogin = (SignInButton) findViewById(R.id.sign_in_button);
 
@@ -75,7 +101,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
     private void updateUI(boolean isLogin) {
 
         if(isLogin) {
-            Intent welcomePage = new Intent(Login.this, UserMainArea.class);
+            Intent welcomePage = new Intent(Login.this, Welcome.class);
             Login.this.startActivity(welcomePage);
         }
     }
@@ -130,5 +156,4 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Go
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
 }

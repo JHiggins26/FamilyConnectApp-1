@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Family Connect</string>
+    <string name="title_activity_create_activities">createActivities</string>
+    <string name="title_familyactivity_list">Family Activities</string>
+    <string name="title_familyactivity_detail">Family Activity Detail</string>
+    <string name="title_activity_grouped_activities">GroupedActivities</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_welcome">Welcome</string>
 </resources>
