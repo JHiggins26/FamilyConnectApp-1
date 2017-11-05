@@ -72,6 +72,7 @@ public class DisplayActivitiesTab extends Fragment {
             if(CreateActivitiesTab.getIsCreated()) {
 
                 CreateActivitiesTab.getName().setText("");
+                CreateActivitiesTab.getDate().setText("");
                 CreateActivitiesTab.getTime().setText("");
                 CreateActivitiesTab.getWeather().setText("");
                 CreateActivitiesTab.getCategory().setText("");

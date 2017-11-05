@@ -310,12 +310,20 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
         CreateActivitiesTab.name = name;
     }
 
-    public static EditText getTime() {
+    public static EditText getDate() {
         return date;
     }
 
-    public static void setTime(EditText date) {
+    public static void setDate(EditText date) {
         CreateActivitiesTab.date = date;
+    }
+
+    public static EditText getTime() {
+        return time;
+    }
+
+    public static void setTime(EditText time) {
+        CreateActivitiesTab.time = time;
     }
 
     public static EditText getWeather() {
