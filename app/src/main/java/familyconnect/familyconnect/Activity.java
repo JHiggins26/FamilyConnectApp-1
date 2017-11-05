@@ -3,14 +3,15 @@ package familyconnect.familyconnect;
 
 public class Activity {
 
-    private String name, time, weather, category, groupName;
+    private String name, date, time, weather, category, groupName;
 
-    public Activity(String name) {
+    public Activity(String name, String date, String time, String weather, String category, String groupName) {
         this.name = name;
-        /*this.time = time;
+        this.date = date;
+        this.time = time;
         this.weather = weather;
         this.category = category;
-        this.groupName = groupName;*/
+        this.groupName = groupName;
     }
 
     public String getName() {
@@ -20,6 +21,12 @@ public class Activity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) { this.date = date; }
 
     public String getTime() {
         return time;
@@ -55,11 +62,6 @@ public class Activity {
 
     @Override
     public String toString() {
-        return name + "\n";
-                /*", time='" + time + '\'' +
-                ", weather='" + weather + '\'' +
-                ", category='" + category + '\'' +
-                ", groupName='" + groupName + '\'' +
-                '}';*/
+        return "";
     }
 }

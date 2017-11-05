@@ -1,24 +1,37 @@
 package familyconnect.familyconnect;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -26,35 +39,51 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.widget.Toast;
+
+import familyconnect.familyconnect.Widgets.DatePickerFragment;
+import familyconnect.familyconnect.Widgets.TimePickerFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class CreateActivitiesTab extends Fragment implements View.OnClickListener {
 
-    private static EditText name, time, weather, category, group = null;
+    private static EditText name, date, time, weather, category, group = null;
 
-    private String readName, readTime, readWeather, readCategory, readGroup = null;
-    private boolean POST= false;
+    private String readName, readDate, readTime, readWeather, readCategory, readGroup = null;
+    private boolean POST, GET = false;
     private static boolean isCreated = false;
     private RequestQueue queue;
+    private double longitude, latitude;
+    private GPSLocation gps;
+
+    private static Button weatherButton;
 
     private static ArrayList<Activity> activitiesList = new ArrayList<Activity>();
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.createactivitiestab, container, false);
 
         name = rootView.findViewById(R.id.activityName);
-
+        date = rootView.findViewById(R.id.activityDate);
         time = rootView.findViewById(R.id.activityTime);
-
         weather = rootView.findViewById(R.id.activityWeather);
-
         category = rootView.findViewById(R.id.activityCategory);
-
         group = rootView.findViewById(R.id.activityGroup);
+        weatherButton = rootView.findViewById(R.id.weatherButton);
+
+
+        //Allows Text Field to be clicked
+        date.setOnClickListener(this);
+        time.setOnClickListener(this);
+
+        //Invisible Weather Button
+        weatherButton.setOnClickListener(this);
+        weatherButton.setVisibility(View.GONE);
 
         queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
@@ -64,21 +93,23 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
             public void onClick(View view) {
 
                 readName = name.getText().toString();
+                readDate = date.getText().toString();
                 readTime = time.getText().toString();
                 readWeather = weather.getText().toString();
                 readCategory = category.getText().toString();
                 readGroup = group.getText().toString();
 
 
-                if(readName.matches("")) {
+                if (readName.matches("") || readDate.matches("") || readTime.matches("") || readWeather.matches("")
+                        || readCategory.matches("") || readGroup.matches("")) {
 
                     Snackbar.make(view, "Please fill out activity fields!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                }
-                else {
-                    Log.v("Created", "ReadName: " + readName);
+                } else {
+                    Log.v("Created", "ReadName: " + readName + ", ReadDate: " + readDate + ", ReadTime: " + readTime
+                    + ", ReadWeather: " + readWeather + ", ReadCategory: " + readCategory + ", ReadGroup: " + readGroup);
 
-                    Activity activity = new Activity(readName);
+                    Activity activity = new Activity(readName, readDate, readTime, readWeather, readCategory, readGroup);
                     activitiesList.add(activity);
 
                     isCreated = true;
@@ -88,6 +119,7 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                     //String uriPost ="https://myprojects-mikeh87.c9users.io/users/1/activities";
                     taskPost.execute(uriPost);
                     POST = true;
+                    GET = false;
 
                     Snackbar.make(view, "Activity Created", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -95,6 +127,7 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
             }
         });
 
+        getGPSLocation();
         return rootView;
     }
 
@@ -102,6 +135,80 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
 
+        switch (v.getId()) {
+
+            case R.id.activityDate:
+                showDatePickerDialog(v);
+                break;
+
+            case R.id.activityTime:
+                showTimePickerDialog(v);
+                break;
+
+            case R.id.weatherButton:
+                showWeatherDialog();
+                break;
+        }
+    }
+
+
+    public void showWeatherDialog() {
+        FamilyConnectFetchTask taskPost = new FamilyConnectFetchTask();
+        //URI REQUEST: DOMAIN   /KEY   /LAT,LON   ,YYYY-MM-DD   T   HH:MM:SS
+        String uriGet = "https://api.darksky.net/forecast/879da94f7c402798f1bf303383070b27/" + latitude + "," + longitude + "," +
+                DatePickerFragment.getSpecialDateFormat() + "T" + TimePickerFragment.getSpecialFormatTime();
+
+        Log.v("URI" ,uriGet);
+        taskPost.execute(uriGet);
+        GET = true;
+        POST = false;
+    }
+
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(),"TimePicker");
+    }
+
+
+    public void getGPSLocation() {
+
+        gps = new GPSLocation(getActivity().getApplicationContext());
+        Location l = gps.getLocation();
+
+        if(l != null) {
+            latitude = l.getLatitude();
+            longitude = l.getLongitude();
+
+            Toast.makeText(getActivity().getApplicationContext(), "Your Location is - \nLat: " +
+                    latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+        }
+        else {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            // Setting Dialog Title
+            alertDialog.setTitle("GPS Settings");
+            // Setting Dialog Message
+            alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+            // On pressing Settings button
+            alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,int which) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    getActivity().startActivity(intent);
+                }
+            });
+            // on pressing cancel button
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            // Showing Alert Message
+            alertDialog.show();
+        }
     }
 
 
@@ -112,7 +219,7 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
             Log.v("FamilyConnect", "URL = " + params[0]);
 
-            //POST REQUEST
+            //POST REQUEST FOR CREATING ACTIVITY
             if (POST) {
 
                 try {
@@ -147,87 +254,42 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                //Alternative POST Method
-        /*try {
-            URL url = new URL(params[0]);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-
-            // Create the data
-            String id = "";
-            String userName = "Jawan";
-            String email = "Jawan@gmail.com";
-            String created = "2017-10-29T22:12:17.391Z";
-            String updated = "2017-10-29T22:12:17.391Z";
-
-            String urlParameters = "id=" + id + "&user_name=" + userName + "&email=" + email +
-                    "&created_at=" + created + "&updated_at=" + updated;
-
-            connection.setDoOutput(true);
-
-            DataOutputStream dataStream = new DataOutputStream(connection.getOutputStream());
-
-            dataStream.write(urlParameters.getBytes());
-            dataStream.flush();
-            dataStream.close();
-
-            int responseCode = connection.getResponseCode();
-            String output = "Request URL " + url;
-            output += System.getProperty("line.separator") + "Request Parameters " + urlParameters;
-            output += System.getProperty("line.separator") + "Response Code " + responseCode;
-
-            Log.v("FamilyConnect", "POST = " + output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        /*final JSONObject jsonObject = new JSONObject();
-
-        StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.d("POST", response);
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.d("Error.Response", ""+error);
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-//                        params.put("user_name", "Bob");
-//                        params.put("email", "Bob@yahoo.com");
-//                        params.put("created", "2017-10-29T22:12:17.391Z");
-//                        params.put("updated", "2017-10-29T22:12:17.391Z");
-
-                params.put("activitie_name", "Baseball");
-                params.put("user_id", new Integer().toString());
-                params.put("created_at", "2017-10-29T22:12:17.391Z");
-                params.put("updated_at", "2017-10-29T22:12:17.391Z");
-
-               /* create_table "activities"
-                    string "activitie_name"
-                integer "user_id"
-                datetime "created_at", null: false
-                datetime "updated_at", null: false
-                index ["user_id"], name: "index_activities_on_user_id"
-
-                return params;
             }
-        };
-        queue.add(postRequest);*/
+            //GET REQUEST FOR WEATHER
+            if (GET) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                                try {
+                                    JSONObject currently = response.getJSONObject("currently");
+
+                                    int temperature = currently.getInt("temperature");
+                                    String summary = currently.getString("summary");
+
+                                    weather.setText("The temperature at " + TimePickerFragment.getTime() + " is " + (temperature) + " °F" + "\n" +
+                                    "Condition: " + summary);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                );
+                queue.add(getRequest);
             }
+
 
             return null;
         }
@@ -249,11 +311,11 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
     }
 
     public static EditText getTime() {
-        return time;
+        return date;
     }
 
-    public static void setTime(EditText time) {
-        CreateActivitiesTab.time = time;
+    public static void setTime(EditText date) {
+        CreateActivitiesTab.date = date;
     }
 
     public static EditText getWeather() {
@@ -286,6 +348,10 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
     public static boolean getIsCreated() {
         return isCreated;
+    }
+
+    public static Button getWeatherButton() {
+        return weatherButton;
     }
 
     public static ArrayList<Activity> getActivitiesList() {

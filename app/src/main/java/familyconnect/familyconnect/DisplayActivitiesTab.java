@@ -33,6 +33,7 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 public class DisplayActivitiesTab extends Fragment {
 
     private static ListView scrollView;
+    private TextView loadingText;
     private RequestQueue queue;
     private boolean GET = false;
     private List<String> jsonArray;
@@ -44,6 +45,7 @@ public class DisplayActivitiesTab extends Fragment {
         View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
 
         scrollView = rootView.findViewById(R.id.activityScroll);
+        loadingText = rootView.findViewById(R.id.loading);
 
         jsonArray = new ArrayList<String>();
 
@@ -203,6 +205,9 @@ public class DisplayActivitiesTab extends Fragment {
             protected void onPostExecute (Bitmap bitmap){
                 super.onPostExecute(bitmap);
 
+                //Deletes the Loading Text when Activities appear
+                loadingText.setText("");
+
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
                         R.layout.listtext, R.id.listText, jsonArray);
 
@@ -214,12 +219,16 @@ public class DisplayActivitiesTab extends Fragment {
                         int itemPosition = position;
                         String  itemValue = (String) scrollView.getItemAtPosition(position);
 
-              Toast.makeText(getActivity().getApplicationContext(),
-                "Position :"+itemPosition+"  Activity : " +itemValue , Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity().getApplicationContext(),"Position :"+itemPosition+"  Activity : " +itemValue , Toast.LENGTH_LONG).show();
+
+//                        for(int i = 0; i < itemPosition; i++) {
+//                            Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
+//                        }
+
                     }
+
                 });
 
             }
-
-        }
+    }
 }
