@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="familyconnect.familyconnect.Login">
+
+    <RelativeLayout
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        android:orientation="horizontal"
+        android:id="@+id/profileSection"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/blueBGimage"
+            android:background="#0c59cf"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/grayBGimage">
+        </ImageView>
+
+
+        <ImageView
+            android:id="@+id/grayBGimage"
+            android:background="#ebebeb"
+            android:layout_width="match_parent"
+            android:layout_height="325dp"
+            android:scaleType="fitXY"
+            android:layout_alignParentEnd="true">
+
+        </ImageView>
+
+        <TextView
+            android:id="@+id/lTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Family Connect"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="60dp"
+            android:fontFamily="cursive"
+            android:layout_marginTop="18dp" />
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="450dp" />
+
+    </RelativeLayout>
+</RelativeLayout>
