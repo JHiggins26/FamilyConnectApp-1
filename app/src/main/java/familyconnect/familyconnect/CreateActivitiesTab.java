@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -69,11 +70,14 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
         View rootView = inflater.inflate(R.layout.createactivitiestab, container, false);
 
         name = rootView.findViewById(R.id.activityName);
+        name.setShowSoftInputOnFocus(false);
         date = rootView.findViewById(R.id.activityDate);
         time = rootView.findViewById(R.id.activityTime);
         weather = rootView.findViewById(R.id.activityWeather);
         category = rootView.findViewById(R.id.activityCategory);
+        category.setShowSoftInputOnFocus(false);
         group = rootView.findViewById(R.id.activityGroup);
+        group.setShowSoftInputOnFocus(false);
         weatherButton = rootView.findViewById(R.id.weatherButton);
 
 

@@ -70,7 +70,9 @@
                 android:layout_marginTop="5dp"
                 android:background="#f3f3f3"
                 android:hint="activity name"
-                android:paddingLeft="5dp" />
+                android:paddingLeft="5dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
 
             <EditText
                 android:id="@+id/activityDate"
@@ -110,7 +112,8 @@
                 android:layout_marginTop="5dp"
                 android:background="#f3f3f3"
                 android:hint="category"
-                android:paddingLeft="5dp" />
+                android:paddingLeft="5dp"
+                />
 
             <EditText
                 android:id="@+id/activityGroup"

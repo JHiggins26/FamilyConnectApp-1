@@ -54,6 +54,13 @@ public class GroupedActivities extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        tabLayout.getTabAt(0).setIcon(R.drawable.home_icon);
+        tabLayout.getTabAt(1).setIcon(R.drawable.activity_list_icon);
+        tabLayout.getTabAt(2).setIcon(R.drawable.add_list_icon);
+        tabLayout.getTabAt(3).setIcon(R.drawable.group_icon);
+
+
+
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,13 +112,23 @@ public class GroupedActivities extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    CreateActivitiesTab tab1 = new CreateActivitiesTab();
+                    HomeTab tab1 = new HomeTab();
 
                     return tab1;
                 case 1:
                     DisplayActivitiesTab tab2 = new DisplayActivitiesTab();
 
                     return tab2;
+
+                case 2:
+                    CreateActivitiesTab tab3 = new CreateActivitiesTab();
+
+                    return tab3;
+
+                case 3:
+                    GroupsTab tab4 = new GroupsTab();
+
+                    return tab4;
 
                 default:
                     return null;
@@ -121,16 +138,20 @@ public class GroupedActivities extends AppCompatActivity {
         @Override
         public int getCount() {
             // Switched view to two tabs
-            return 2;
+            return 4;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Create Activity";
+                    return "";
                 case 1:
-                    return "Activities";
+                    return "";
+                case 2:
+                    return "";
+                case 3:
+                    return "";
             }
             return null;
         }

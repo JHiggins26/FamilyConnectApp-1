@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
@@ -24,11 +25,15 @@
         <activity android:name=".UserMainArea" />
         <activity
             android:name=".GroupedActivities"
-            android:label="@string/title_activity_grouped_activities"
+            android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Welcome"
-            android:label="@string/title_activity_welcome"
+            android:label="Family Connect"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ActivityDetails"
+            android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
