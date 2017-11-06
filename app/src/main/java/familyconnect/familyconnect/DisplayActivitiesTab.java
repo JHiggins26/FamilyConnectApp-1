@@ -1,5 +1,6 @@
 package familyconnect.familyconnect;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import familyconnect.familyconnect.Widgets.DatePickerFragment;
+import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 public class DisplayActivitiesTab extends Fragment {
@@ -37,6 +41,7 @@ public class DisplayActivitiesTab extends Fragment {
     private RequestQueue queue;
     private boolean GET = false;
     private List<String> jsonArray;
+    private static String activityDetailsTitle;
 
 
     @Override
@@ -77,6 +82,9 @@ public class DisplayActivitiesTab extends Fragment {
                 CreateActivitiesTab.getWeather().setText("");
                 CreateActivitiesTab.getCategory().setText("");
                 CreateActivitiesTab.getGroup().setText("");
+
+                DatePickerFragment.setSpecialDateFormat("");
+                TimePickerFragment.setSpecialFormatTime("");
 
                 CreateActivitiesTab.setCreated(false);
             }
@@ -140,7 +148,7 @@ public class DisplayActivitiesTab extends Fragment {
 
                     for(FamilyConnectActivitiesHttpResponse activities : rets) {
 
-                        jsonArray.add(activities.getActivitieName());
+                        jsonArray.add(0, activities.getActivitieName());
                         Log.v("Activity Objects", "" + activities);
                     }
                 } catch (IOException e) {
@@ -220,16 +228,21 @@ public class DisplayActivitiesTab extends Fragment {
                         int itemPosition = position;
                         String  itemValue = (String) scrollView.getItemAtPosition(position);
 
+                            activityDetailsTitle = jsonArray.get(itemPosition) + " Details";
+                            //Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
+
+
+                        Intent showActivityPage = new Intent(getActivity(), ActivityDetails.class);
+                        DisplayActivitiesTab.this.startActivity(showActivityPage);
+
                         //Toast.makeText(getActivity().getApplicationContext(),"Position :"+itemPosition+"  Activity : " +itemValue , Toast.LENGTH_LONG).show();
-
-//                        for(int i = 0; i < itemPosition; i++) {
-//                            Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
-//                        }
-
                     }
-
                 });
 
             }
+    }
+
+    public static String getActivityDetailsTitle() {
+        return activityDetailsTitle;
     }
 }

@@ -80,7 +80,7 @@
                 android:id="@+id/activityScroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="90dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginBottom="50dp"
                 android:layout_weight="1"
                 android:text="Loading Activities...">
