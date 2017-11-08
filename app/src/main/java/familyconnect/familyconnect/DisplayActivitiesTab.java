@@ -36,7 +36,7 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 public class DisplayActivitiesTab extends Fragment {
 
     private static ListView scrollView;
-    //private TextView loadingText;
+    private TextView loadingText;
     private RequestQueue queue;
     private boolean GET = false;
     private List<String> jsonArray;
@@ -47,10 +47,10 @@ public class DisplayActivitiesTab extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.testconstraint, container, false);
+        View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
 
         scrollView = rootView.findViewById(R.id.activityScroll);
-        //loadingText = rootView.findViewById(R.id.loading);
+        loadingText = rootView.findViewById(R.id.loading);
 
         jsonArray = new ArrayList<String>();
         activityList = new ArrayList<Activity>();
@@ -222,7 +222,7 @@ public class DisplayActivitiesTab extends Fragment {
                 super.onPostExecute(bitmap);
 
                 //Deletes the Loading Text when Activities appear
-                //loadingText.setText("");
+                loadingText.setText("");
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
                             R.layout.displayactivitylist, R.id.listText, jsonArray);
