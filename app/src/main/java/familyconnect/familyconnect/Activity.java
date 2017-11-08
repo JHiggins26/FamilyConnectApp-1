@@ -3,13 +3,15 @@ package familyconnect.familyconnect;
 
 public class Activity {
 
-    private String name, date, time, weather, category, groupName;
+    private String name, date, time, weatherDegrees, weatherSummary, weatherIcon, category, groupName;
 
-    public Activity(String name, String date, String time, String weather, String category, String groupName) {
+    public Activity(String name, String date, String time, String weatherDegrees, String weatherSummary, String weatherIcon, String category, String groupName) {
         this.name = name;
         this.date = date;
         this.time = time;
-        this.weather = weather;
+        this.weatherDegrees = weatherDegrees;
+        this.weatherSummary = weatherSummary;
+        this.weatherIcon = weatherIcon;
         this.category = category;
         this.groupName = groupName;
     }
@@ -36,13 +38,27 @@ public class Activity {
         this.time = time;
     }
 
-    public String getWeather() {
-        return weather;
+    public String getWeatherDegrees() {
+        return weatherDegrees;
     }
 
-    public void setWeather(String weather) {
-        this.weather = weather;
+    public void setWeatherDegrees(String weatherDegrees) {
+        this.weatherDegrees = weatherDegrees;
     }
+
+    public String getWeatherSummary() {
+        return weatherSummary;
+    }
+
+    public void setWeatherSummary(String weatherSummary) {
+        this.weatherSummary = weatherSummary;
+    }
+
+    public String getWeatherIcon() {
+        return weatherIcon;
+    }
+
+    public void setWeatherIcon(String weatherIcon) { this.weatherIcon = weatherIcon; }
 
     public String getCategory() {
         return category;

@@ -11,10 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -37,22 +36,24 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 public class DisplayActivitiesTab extends Fragment {
 
     private static ListView scrollView;
-    private TextView loadingText;
+    //private TextView loadingText;
     private RequestQueue queue;
     private boolean GET = false;
     private List<String> jsonArray;
-    private static String activityDetailsTitle;
+    private List<Activity> activityList;
+    private static String activityDetailsTitle, activityWeatherTemp, activityWeatherSummary, activityWeatherIcon;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
+        View rootView = inflater.inflate(R.layout.testconstraint, container, false);
 
         scrollView = rootView.findViewById(R.id.activityScroll);
-        loadingText = rootView.findViewById(R.id.loading);
+        //loadingText = rootView.findViewById(R.id.loading);
 
         jsonArray = new ArrayList<String>();
+        activityList = new ArrayList<Activity>();
 
         queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
@@ -64,14 +65,16 @@ public class DisplayActivitiesTab extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
 
-            GET = true;
+            //loadingText.setText("Loading Activities...");
 
-            //Clear JSON
+            //Clear JSON and Activity array to Sync the list
             jsonArray.clear();
+            activityList.clear();
+
+            GET = true;
 
             DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
             String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
-            //String uriGet ="https://myprojects-mikeh87.c9users.io/users";
             taskGet.execute(uriGet);
 
             if(CreateActivitiesTab.getIsCreated()) {
@@ -90,7 +93,7 @@ public class DisplayActivitiesTab extends Fragment {
             }
         }
         else {
-
+            //Do Nothing
         }
     }
 
@@ -148,8 +151,12 @@ public class DisplayActivitiesTab extends Fragment {
 
                     for(FamilyConnectActivitiesHttpResponse activities : rets) {
 
+                        //JsonArray is just for the Individual Activity Title on the Activity Details Page
                         jsonArray.add(0, activities.getActivitieName());
-                        Log.v("Activity Objects", "" + activities);
+
+                        Activity activity = new Activity(activities.getActivitieName(), "", "", "",
+                                "", "", "", "");
+                        activityList.add(0, activity);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -215,21 +222,26 @@ public class DisplayActivitiesTab extends Fragment {
                 super.onPostExecute(bitmap);
 
                 //Deletes the Loading Text when Activities appear
-                loadingText.setText("");
+                //loadingText.setText("");
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
-                        R.layout.listtext, R.id.listText, jsonArray);
+                            R.layout.displayactivitylist, R.id.listText, jsonArray);
 
                 scrollView.setAdapter(arrayAdapter);
 
                 scrollView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         int itemPosition = position;
                         String  itemValue = (String) scrollView.getItemAtPosition(position);
 
-                            activityDetailsTitle = jsonArray.get(itemPosition) + " Details";
-                            //Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
+                        activityDetailsTitle = activityList.get(itemPosition).getName();
+                        activityWeatherTemp = activityList.get(itemPosition).getWeatherDegrees();
+                        activityWeatherSummary = activityList.get(itemPosition).getWeatherSummary();
+                        activityWeatherIcon = activityList.get(itemPosition).getWeatherIcon();
+
+                        //Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
 
 
                         Intent showActivityPage = new Intent(getActivity(), ActivityDetails.class);
@@ -244,5 +256,14 @@ public class DisplayActivitiesTab extends Fragment {
 
     public static String getActivityDetailsTitle() {
         return activityDetailsTitle;
+    }
+    public static String getActivityWeatherTemp() {
+        return activityWeatherTemp;
+    }
+    public static String getActivityWeatherSummary() {
+        return activityWeatherSummary;
+    }
+    public static String getActivityWeatherIcon() {
+        return activityWeatherIcon;
     }
 }

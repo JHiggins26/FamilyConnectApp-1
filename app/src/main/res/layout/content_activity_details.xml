@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,17 +8,12 @@
     tools:context="familyconnect.familyconnect.ActivityDetails"
     tools:showIn="@layout/activity_details">
 
-<RelativeLayout
-    android:layout_width="368dp"
-    android:layout_height="495dp"
-    android:orientation="horizontal"
-    android:id="@+id/profileSection"
-    tools:layout_editor_absoluteY="8dp"
-    tools:layout_editor_absoluteX="8dp"
-    android:layout_alignParentEnd="true"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentTop="true">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="vertical">
+
 
     <ImageView
         android:id="@+id/grayBGimage"
@@ -29,49 +24,267 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true">
-
     </ImageView>
 
-    <TextView
-    android:id="@+id/activityDetailsTitle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Activity"
-    android:textAlignment="center"
-    android:textColor="#000000"
-    android:textSize="30dp"
-    android:fontFamily=""
-    android:layout_alignTop="@+id/linearLayout"
-    android:layout_alignParentStart="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical">
+            <TextView
+            android:id="@+id/activityDetailsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Activity"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="40dp"
+            android:fontFamily=""
+            android:layout_alignTop="@+id/linearLayout"
+            android:layout_alignParentStart="true" />
 
 
-        <!--<android.support.design.widget.FloatingActionButton-->
-            <!--android:id="@+id/fab"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="end|bottom"-->
-            <!--android:layout_marginLeft="260dp"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--app:backgroundTint="#ffffff"-->
-            <!--app:srcCompat="@android:drawable/ic_input_add" />-->
+            <ImageView
+                android:id="@+id/weatherImage"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp">
+            </ImageView>
 
+
+            <TextView
+                android:id="@+id/weatherSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="N/A"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textColor="#000000"
+                android:textSize="25dp"
+                android:fontFamily=""/>
+
+            <TextView
+                android:id="@+id/weatherTemp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="N/A"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textColor="#000000"
+                android:textSize="25dp"
+                android:fontFamily=""
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/calendarImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/calendar_icon">
+                </ImageView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="0dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dateDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:textAlignment="center"
+                        android:layout_gravity="center"
+                        android:textColor="#000000"
+                        android:textSize="30dp"
+                        android:fontFamily=""
+                        />
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/clockImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/clock_icon">
+                </ImageView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/timeDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:textAlignment="center"
+                        android:layout_gravity="center"
+                        android:textColor="#000000"
+                        android:textSize="30dp"
+                        android:fontFamily=""
+                        />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/categoryImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/category_icon">
+                </ImageView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/categoryDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:textAlignment="center"
+                        android:layout_gravity="center"
+                        android:textColor="#000000"
+                        android:textSize="30dp"
+                        android:fontFamily=""
+                        />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/groupImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/group_1_icon">
+                </ImageView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/groupDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:textAlignment="center"
+                        android:layout_gravity="center"
+                        android:textColor="#000000"
+                        android:textSize="30dp"
+                        android:fontFamily=""
+                        />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/x_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:background="@drawable/x_icon"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
+                    android:layout_marginTop="0dp"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/check_button"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginLeft="200dp"
+                        android:background="@drawable/check_icon"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/creditAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily=""
+                android:text="Icon made by Freepik from www.flaticon.com"
+                android:textAlignment="center"
+                android:layout_alignParentBottom="true"
+                android:textColor="#000000"
+                android:textSize="5dp"
+                />
+
+
+            <!--<android.support.design.widget.FloatingActionButton-->
+                <!--android:id="@+id/fab"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="end|bottom"-->
+                <!--android:layout_marginLeft="260dp"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:layout_marginTop="10dp"-->
+                <!--app:backgroundTint="#ffffff"-->
+                <!--app:srcCompat="@android:drawable/ic_input_add" />-->
+
+        </LinearLayout>
 
     </RelativeLayout>
 
 
-</RelativeLayout>
-
-</RelativeLayout>
+</ScrollView>
