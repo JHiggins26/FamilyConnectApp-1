@@ -34,7 +34,8 @@
         <activity
             android:name=".ActivityDetails"
             android:label="Family Connect"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CreateActivity"></activity>
     </application>
 
 </manifest>

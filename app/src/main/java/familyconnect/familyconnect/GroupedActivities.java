@@ -56,8 +56,7 @@ public class GroupedActivities extends AppCompatActivity {
 
         tabLayout.getTabAt(0).setIcon(R.drawable.home_icon);
         tabLayout.getTabAt(1).setIcon(R.drawable.activity_list_icon);
-        tabLayout.getTabAt(2).setIcon(R.drawable.add_list_icon);
-        tabLayout.getTabAt(3).setIcon(R.drawable.group_icon);
+        tabLayout.getTabAt(2).setIcon(R.drawable.group_icon);
 
 
 
@@ -121,14 +120,9 @@ public class GroupedActivities extends AppCompatActivity {
                     return tab2;
 
                 case 2:
-                    CreateActivitiesTab tab3 = new CreateActivitiesTab();
+                    GroupsTab tab3 = new GroupsTab();
 
                     return tab3;
-
-                case 3:
-                    GroupsTab tab4 = new GroupsTab();
-
-                    return tab4;
 
                 default:
                     return null;
@@ -138,7 +132,7 @@ public class GroupedActivities extends AppCompatActivity {
         @Override
         public int getCount() {
             // Switched view to two tabs
-            return 4;
+            return 3;
         }
 
         @Override
@@ -149,8 +143,6 @@ public class GroupedActivities extends AppCompatActivity {
                 case 1:
                     return "";
                 case 2:
-                    return "";
-                case 3:
                     return "";
             }
             return null;

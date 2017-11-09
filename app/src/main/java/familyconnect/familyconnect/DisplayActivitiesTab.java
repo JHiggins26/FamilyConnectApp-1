@@ -3,6 +3,8 @@ package familyconnect.familyconnect;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,6 +58,17 @@ public class DisplayActivitiesTab extends Fragment {
         activityList = new ArrayList<Activity>();
 
         queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent createActivityPage = new Intent(getActivity(), CreateActivity.class);
+                DisplayActivitiesTab.this.startActivity(createActivityPage);
+
+            }
+        });
 
         return rootView;
     }
@@ -161,56 +174,6 @@ public class DisplayActivitiesTab extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-                //Alternate GET Method (THE BEST WAY, HOWEVER BRACES THROW JSON PARSE ERROR)
-                /*final JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
-                        new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                // response
-                                try {
-
-                                    String name = response.toString().substring(1,response.toString().length()-1);
-                                    String name2 = response.getString("activitie_name");
-
-                                    list.setText(name2);
-
-
-                                } catch (JSONException e) {
-
-                                }
-
-
-
-                                Log.d("GET", response.toString().substring(1,response.toString().length()-1));
-
-                                //Format JSON into Object
-                              /*  Gson gson = new Gson();
-                                JsonReader jsonReader = new JsonReader(new StringReader(response.toString()));
-                                jsonReader.setLenient(true);
-
-                                FamilyConnectActivitiesHttpResponse httpResponse =
-                                        gson.fromJson(jsonReader, FamilyConnectActivitiesHttpResponse.class);
-
-                                //String activityName = httpResponse.getActivitieName();
-                                //list.setText(activityName);
-                                //Log.v("Activity Name", activityName);
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // error
-                                Log.d("Error.Response", error.toString());
-
-                            }
-                        }
-                );
-
-                queue.add(getRequest);*/
             }
 
                 return null;
