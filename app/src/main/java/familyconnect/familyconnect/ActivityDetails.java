@@ -38,7 +38,7 @@ import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
 public class ActivityDetails extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView activityTitle, weatherSummary, weatherTemp;
+    private TextView activityTitle, weatherSummary, highTemp, lowTemp, group, category;
     private Button buttonDelete, buttonComplete;
     private ImageView weatherIcon;
     private boolean PUT, DELETE = false;
@@ -53,11 +53,15 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(toolbar);
 
         activityTitle = (TextView) findViewById(R.id.activityDetailsTitle);
-        activityTitle.setText(DisplayActivitiesTab.getActivityDetailsTitle() + " Details");
 
         weatherIcon = (ImageView) findViewById(R.id.weatherImage);
         weatherSummary = (TextView) findViewById(R.id.weatherSummary);
-        weatherTemp = (TextView) findViewById(R.id.weatherTemp);
+        lowTemp = (TextView) findViewById(R.id.low_temp_desc);
+        highTemp = (TextView) findViewById(R.id.high_temp_desc);
+
+        group = (TextView) findViewById(R.id.groupDesc);
+        category = (TextView) findViewById(R.id.categoryDesc);
+
 
         buttonDelete = (Button) findViewById(R.id.x_button);
         buttonComplete = (Button) findViewById(R.id.check_button);
@@ -68,15 +72,13 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         queue = Volley.newRequestQueue(this);
 
 
-//        setWeatherImage(DisplayActivitiesTab.getActivityWeatherIcon());
-//        weatherTemp.setText(DisplayActivitiesTab.getActivityWeatherTemp());
-//        weatherSummary.setText(DisplayActivitiesTab.getActivityWeatherSummary());
-
+        activityTitle.setText(DisplayActivitiesTab.getActivityDetailsTitle() + " Details");
         setWeatherImage("partly-cloudy-day");
-        weatherTemp.setText("75 °F");
-        weatherSummary.setText("Partly Cloudy");
-
-
+        weatherSummary.setText(DisplayActivitiesTab.getActivityWeatherSummary());
+        lowTemp.setText(DisplayActivitiesTab.getActivityWeatherLow() + " °F");
+        highTemp.setText(DisplayActivitiesTab.getActivityWeatherHigh() + " °F");
+        category.setText(DisplayActivitiesTab.getActivityCategory());
+        group.setText(DisplayActivitiesTab.getActivityGroup());
     }
 
     @Override
@@ -96,12 +98,12 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                         .setMessage("Are you sure you want to delete this " + DisplayActivitiesTab.getActivityDetailsTitle() + " activity?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                DELETE = true;
+                                PUT = false;
+
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
                                 String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
                                 taskGet.execute(uriDelete);
-
-                                DELETE = true;
-                                PUT = false;
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -121,8 +123,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
     }
 
     public void setWeatherImage(String condition) {
-
-        //"clear-day", "clear-night", "partly-cloudy-day","partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind","fog"
 
         switch (condition) {
 
@@ -259,7 +259,9 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
 
                 final JSONObject jsonObject = new JSONObject();
 
-                JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE, params[0] + "/6", jsonObject,
+                JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                        params[0] + "/" + DisplayActivitiesTab.getActivityId(), jsonObject,
+
                         new Response.Listener<JSONObject>() {
 
                             @Override

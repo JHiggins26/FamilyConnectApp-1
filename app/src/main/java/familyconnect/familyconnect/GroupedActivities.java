@@ -1,5 +1,6 @@
 package familyconnect.familyconnect;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -34,7 +35,7 @@ public class GroupedActivities extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private static ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,17 +58,6 @@ public class GroupedActivities extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(R.drawable.home_icon);
         tabLayout.getTabAt(1).setIcon(R.drawable.activity_list_icon);
         tabLayout.getTabAt(2).setIcon(R.drawable.group_icon);
-
-
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
     }
 
@@ -109,6 +99,11 @@ public class GroupedActivities extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
 
+//            if(CreateActivity.getIsUpdated()) {
+//                position = 1;
+//                CreateActivity.setIsUpdated(false);
+//            }
+
             switch (position) {
                 case 0:
                     HomeTab tab1 = new HomeTab();
@@ -131,12 +126,18 @@ public class GroupedActivities extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Switched view to two tabs
+            // Switched view to three tabs
             return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
+
+//            if(CreateActivity.getIsUpdated()) {
+//                position = 1;
+//                CreateActivity.setIsUpdated(false);
+//            }
+
             switch (position) {
                 case 0:
                     return "";
@@ -147,5 +148,9 @@ public class GroupedActivities extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    public static ViewPager getViewPager() {
+        return mViewPager;
     }
 }

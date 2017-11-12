@@ -1,5 +1,8 @@
 package familyconnect.familyconnect;
 
+import android.app.*;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -8,17 +11,26 @@ import android.graphics.drawable.shapes.Shape;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -33,10 +45,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataOutputStream;
+import java.io.FileDescriptor;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import io.apptik.widget.MultiSlider;
@@ -44,17 +59,17 @@ import io.apptik.widget.MultiSlider;
 public class CreateActivity extends AppCompatActivity {
 
     private static EditText name;
-    private static TextView tempPercent, tempStatus, weatherConditionDropdownText, groupDropdownText, categoryDropdownText;
-    private String categoryDropdownValue, groupDropdownValue, weatherConditionDropdownValue;
-    private static ToggleButton in_out;
-    private static Spinner weatherConditionDropdown, groupDropdown, categoryDropdown;
+    private static TextView tempPercent, tempStatus, weatherConditionDropdownText, groupDropdownText;
+    private static Switch in_out_switch;
+    private static Spinner weatherConditionDropdown, groupDropdown;
     private static MultiSlider weatherBar;
     private static View tempCircle;
-    private static int progressValue = 0, tempHigh = 0, tempLow = 0, rightProgressValue = 0, leftProgressValue = 0;
+    private static int tempHigh = 0, tempLow = 0, rightProgressValue = 100, leftProgressValue = 0;
     private boolean isProgressValue = false;
     private boolean POST = false;
     private static boolean isCreated = false;
-
+    private String groupDropdownValue, weatherConditionDropdownValue;
+    private static boolean isUpdated = false;
 
 
     @Override
@@ -62,11 +77,10 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
-        name = (EditText) findViewById(R.id.activityName);
-        in_out = (ToggleButton) findViewById(R.id.in_out_Button);
+        in_out_switch = (Switch) findViewById(R.id.in_out_switch);
 
-        categoryDropdown = (Spinner) findViewById(R.id.categoryDropdown);
-        categoryDropdownText = (TextView) findViewById(R.id.categoryDropdownText);
+        name = (EditText) findViewById(R.id.activityName);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         groupDropdown = (Spinner) findViewById(R.id.groupDropdown);
         groupDropdownText = (TextView) findViewById(R.id.groupDropdownText);
@@ -79,12 +93,11 @@ public class CreateActivity extends AppCompatActivity {
         tempStatus = (TextView) findViewById(R.id.tempStatus);
 
 
-        //tempCircle = findViewById(R.id.tempCircle);
-
-        setCategoryDropdown();
+        setIndoorOutdoor();
         setGroupDropdown();
         setWeatherConditionDropdown();
         getTemperatureDegrees();
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -92,9 +105,8 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Checking to see if User Inputs are filled out
                 if (name.getText().toString().matches("") ||
-                        weatherConditionDropdownText.getText().toString().matches("How's the weather\\?") ||
-                        isProgressValue == false || groupDropdownText.getText().toString().matches("Select a group") ||
-                        categoryDropdownText.getText().toString().matches("Select a category")) {
+                        groupDropdownText.getText().toString().matches("Select a group") ||
+                        weatherConditionDropdownText.getText().toString().matches("Select a weather condition")) {
 
                     Snackbar.make(view, "Please fill out activity fields!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -109,113 +121,47 @@ public class CreateActivity extends AppCompatActivity {
                     POST = true;
 
                     Snackbar.make(view, "Activity Created", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();             }
-            }
-        });
-    }
+                            .setAction("Action", null).show();
 
-    public void getTemperatureDegrees() {
+                    DisplayActivitiesTab tab = new DisplayActivitiesTab();
 
-        weatherBar.setOnThumbValueChangeListener(new MultiSlider.OnThumbValueChangeListener() {
-            @Override
-            public void onValueChanged(MultiSlider multiSlider, MultiSlider.Thumb thumb, int thumbIndex, int value) {
+                   // Intent displayActivityPage = new Intent(CreateActivity.this, GroupedActivities.class);
+                    //CreateActivity.this.startActivity(displayActivityPage);
 
-                isProgressValue = true;
-
-                //LEFT HANDLE
-                if (thumbIndex == 0) {
-                    leftProgressValue = value;
-                    leftProgressValue++;
-                }
-                //RIGHT HANDLE
-                else {
-                    rightProgressValue = value;
-                    rightProgressValue--;
-                }
+                   // displayActivityPage.putExtra("DisplayActivities", 2);
+                   // startActivity(displayActivityPage);
+                    isUpdated = true;
 
 
-                if(rightProgressValue <= 35) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#8EE5FF"));
-                    tempStatus.setText("COLD");
-                    tempHigh = 35;
-                    tempLow = 0;
-                }
-                if(leftProgressValue >= 0 && rightProgressValue > 35) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#8EE5FF"));
-                    tempStatus.setText("COLD OR HIGHER");
-                    tempHigh = 35;
-                    tempLow = 0;
-                }
-                if(leftProgressValue > 35 ) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#6AB3FF"));
-                    tempStatus.setText("COOL OR HIGHER");
-                    tempHigh = 35;
-                    tempLow = 0;
-                }
-                if(leftProgressValue > 35 && rightProgressValue <= 65) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#6AB3FF"));
-                    tempStatus.setText("COOL");
-                    tempHigh = 65;
-                    tempLow = 36;
-                }
-                if(leftProgressValue > 65) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#FF8154"));
-                    tempStatus.setText("WARM OR HIGHER");
-                    tempHigh = 65;
-                    tempLow = 36;
-                }
-                if(leftProgressValue > 65 && rightProgressValue <= 80) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#FF8154"));
-                    tempStatus.setText("WARM");
-                    tempHigh = 80;
-                    tempLow = 66;
-                }
-                if(leftProgressValue > 80) {
-                    tempStatus.setBackgroundColor(Color.parseColor("#FF1C15"));
-                    tempStatus.setText("HOT");
-                    tempHigh = 80;
-                    tempLow = 66;
-                }
 
-
-                tempPercent.setText("Low: " + leftProgressValue + " °F" + " / " + "High: " + rightProgressValue + " °F");
+                }
             }
         });
     }
 
 
-    public void setCategoryDropdown() {
+    public void setIndoorOutdoor() {
 
-        ArrayList<String> options = new ArrayList<String>();
-        options.add("");
-        options.add("Category 1"); options.add("Category 2");
-        options.add("Category 3"); options.add("Category 4");
-        options.add("Category 5"); options.add("Category 6");
+        in_out_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-        ArrayAdapter<String> adapterList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options);
-        categoryDropdown.setAdapter(adapterList);
+                if(isChecked) {
+                    in_out_switch.setText("Indoor Activity");
+                    weatherBar.setEnabled(false);
+                    tempStatus.setBackgroundColor(Color.WHITE);
+                    tempStatus.setText("Temperature Disabled Indoors");
 
-        categoryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                ((TextView) view).setTextColor(Color.WHITE);
-                ((TextView) view).setGravity(Gravity.CENTER);
-                categoryDropdownValue = ((TextView) view).getText().toString();
-
-                int index = categoryDropdown.getSelectedItemPosition();
-
-                if(index > 0) {
-                    categoryDropdownText.setText("");
+                    tempHigh = 0;
+                    tempLow = 0;
                 }
                 else {
-                    categoryDropdownText.setText("Select a category");
+                    in_out_switch.setText("Outdoor Activity");
+                    weatherBar.setEnabled(true);
+                    tempStatus.setText("Set Outdoor Temperature");
+
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
                 }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
             }
         });
     }
@@ -229,7 +175,7 @@ public class CreateActivity extends AppCompatActivity {
         options.add("Group 3"); options.add("Group 4");
         options.add("Group 5"); options.add("Create a Group");
 
-        ArrayAdapter<String> adapterList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options);
+        final ArrayAdapter<String> adapterList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options);
         groupDropdown.setAdapter(adapterList);
 
         groupDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -237,9 +183,8 @@ public class CreateActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                ((TextView) view).setTextColor(Color.WHITE);
-                ((TextView) view).setGravity(Gravity.CENTER);
-                groupDropdownValue = ((TextView) view).getText().toString();
+                groupDropdownText.setBackgroundColor(Color.WHITE);
+                groupDropdownValue = groupDropdown.getSelectedItem().toString();
 
                 int index = groupDropdown.getSelectedItemPosition();
 
@@ -248,6 +193,7 @@ public class CreateActivity extends AppCompatActivity {
                 }
                 else {
                     groupDropdownText.setText("Select a group");
+                    groupDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
                 }
             }
             @Override
@@ -259,7 +205,6 @@ public class CreateActivity extends AppCompatActivity {
 
 
     public void setWeatherConditionDropdown() {
-        //"clear-day", "clear-night", "partly-cloudy-day","partly-cloudy-night", "cloudy", "rain", "sleet", "snow", "wind","fog"
 
         ArrayList<String> options = new ArrayList<String>();
         options.add("");
@@ -277,9 +222,8 @@ public class CreateActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                ((TextView) view).setTextColor(Color.WHITE);
-                ((TextView) view).setGravity(Gravity.CENTER);
-                weatherConditionDropdownValue = ((TextView) view).getText().toString();
+                weatherConditionDropdownText.setBackgroundColor(Color.WHITE);
+                weatherConditionDropdownValue = weatherConditionDropdown.getSelectedItem().toString();
 
                 int index = weatherConditionDropdown.getSelectedItemPosition();
 
@@ -287,7 +231,8 @@ public class CreateActivity extends AppCompatActivity {
                     weatherConditionDropdownText.setText("");
                 }
                 else {
-                    weatherConditionDropdownText.setText("How's the weather?");
+                    weatherConditionDropdownText.setText("Select a weather condition");
+                    weatherConditionDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
                 }
             }
             @Override
@@ -298,57 +243,79 @@ public class CreateActivity extends AppCompatActivity {
     }
 
 
-    /*public void getTemperatureDegrees() {
+    public void getTemperatureDegrees() {
 
-        weatherBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        tempHigh = 100;
+        tempLow = 0;
 
+        weatherBar.setOnThumbValueChangeListener(new MultiSlider.OnThumbValueChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onValueChanged(MultiSlider multiSlider, MultiSlider.Thumb thumb, int thumbIndex, int value) {
 
-                progressValue = progress;
-                isProgressValue = true;
+                //LEFT HANDLE
+                if (thumbIndex == 0) {
+                    leftProgressValue = value;
 
-                if(progressValue <= 35) {
+                    if(leftProgressValue >= 1) {
+                        leftProgressValue++;
+                    }
+                }
+                //RIGHT HANDLE
+                else {
+                    rightProgressValue = value;
 
+                    if(rightProgressValue <= 99) {
+                        rightProgressValue--;
+                    }
+                }
+
+                if (rightProgressValue <= 35) {
                     tempStatus.setBackgroundColor(Color.parseColor("#8EE5FF"));
                     tempStatus.setText("COLD");
-                    tempHigh = 35;
-                    tempLow = 0;
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
                 }
-                else if(progressValue > 35 && progressValue <= 65) {
+                if (leftProgressValue >= 0 && rightProgressValue > 35) {
+                    tempStatus.setBackgroundColor(Color.parseColor("#8EE5FF"));
+                    tempStatus.setText("COLD OR HIGHER");
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
+                }
+                if (leftProgressValue > 35) {
+                    tempStatus.setBackgroundColor(Color.parseColor("#6AB3FF"));
+                    tempStatus.setText("COOL OR HIGHER");
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
+                }
+                if (leftProgressValue > 35 && rightProgressValue <= 65) {
                     tempStatus.setBackgroundColor(Color.parseColor("#6AB3FF"));
                     tempStatus.setText("COOL");
-                    tempHigh = 65;
-                    tempLow = 36;
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
                 }
-                else if(progressValue > 65 && progressValue <= 80) {
+                if (leftProgressValue > 65) {
+                    tempStatus.setBackgroundColor(Color.parseColor("#FF8154"));
+                    tempStatus.setText("WARM OR HIGHER");
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
+                }
+                if (leftProgressValue > 65 && rightProgressValue <= 80) {
                     tempStatus.setBackgroundColor(Color.parseColor("#FF8154"));
                     tempStatus.setText("WARM");
-                    tempHigh = 80;
-                    tempLow = 66;
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
                 }
-                else if(progressValue > 80 && progressValue <= 100) {
+                if (leftProgressValue > 80) {
                     tempStatus.setBackgroundColor(Color.parseColor("#FF1C15"));
                     tempStatus.setText("HOT");
-                    tempHigh = 100;
-                    tempLow = 81;
+                    tempHigh = rightProgressValue;
+                    tempLow = leftProgressValue;
                 }
 
-                tempPercent.setText(progressValue + "/" + weatherBar.getMax() + " °F");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                tempPercent.setText(progressValue + "/" + weatherBar.getMax() + " °F");
+                tempPercent.setText("Low: " + leftProgressValue + " °F" + " / " + "High: " + rightProgressValue + " °F");
             }
         });
-    }*/
-
+    }
 
 
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
@@ -370,10 +337,9 @@ public class CreateActivity extends AppCompatActivity {
                     // Read in the data to PUT in the database
                     int user_id = 1;
                     String activityName = name.getText().toString();
-                    String activityCategory = categoryDropdownValue;
+                    String activityCategory = in_out_switch.getText().toString();
                     String activityGroupName = groupDropdownValue;
                     String activityWeatherCondition = weatherConditionDropdownValue;
-                    String activityWeatherDegrees = progressValue + "";
                     int high = tempHigh;
                     int low = tempLow;
                     String site = "";
@@ -383,7 +349,6 @@ public class CreateActivity extends AppCompatActivity {
                     String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id +
                             "&created_at=" + created + "&updated_at=" + updated + "&condition=" + activityWeatherCondition
                             + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&url=" + site;
-
 
                     connection.setDoOutput(true);
 
@@ -414,7 +379,21 @@ public class CreateActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
 
+    public static boolean getIsUpdated() {
+        return isUpdated;
+    }
 
+    public static void setIsUpdated(boolean isUpdated) {
+        CreateActivity.isUpdated = isUpdated;
+    }
 
 }
