@@ -1,8 +1,11 @@
 package familyconnect.familyconnect;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -11,9 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -36,18 +42,21 @@ import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 
-public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private static ListView scrollView;
     private TextView loadingText;
     private RequestQueue queue;
     private boolean GET = false;
-    private List<String> jsonArray;
-    private static List<Activity> activityList;
+    protected List<String> jsonArray;
+    public static List<Activity> activityList, nonCompletedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
-            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
+            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup, activityComplete;
     private static long activityId;
+    private TextView completedActivitiesBtn;
+    private ImageView starBtn;
+
 
 
     @Override
@@ -62,8 +71,15 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         scrollView = rootView.findViewById(R.id.activityScroll);
         loadingText = rootView.findViewById(R.id.loading);
 
+        completedActivitiesBtn = rootView.findViewById(R.id.completedActivities);
+        completedActivitiesBtn.setOnClickListener(this);
+
+        starBtn = rootView.findViewById(R.id.star_icon);
+        starBtn.setOnClickListener(this);
+
         jsonArray = new ArrayList<String>();
         activityList = new ArrayList<Activity>();
+        nonCompletedActivityList = new ArrayList<Activity>();
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -133,6 +149,11 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        Intent completedActivityPage = new Intent(getActivity(), CompletedActivities.class);
+        DisplayActivitiesTab.this.startActivity(completedActivityPage);
+    }
 
 
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
@@ -188,11 +209,21 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
                         //JsonArray is just for the Individual Activity Title on the Activity Details Page
-                        jsonArray.add(0, activities.getActivitieName());
+                        //jsonArray.add(0, activities.getActivitieName());
 
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(),"ICON", activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A");
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getUrl());
+
                         activityList.add(0, activity);
+
+                        //A check to only display Activities that are not completed yet
+                        if(activities.getUrl().matches("false")) {
+
+                            nonCompletedActivityList.add(0, activity);
+
+                            //JsonArray is just for the Individual Activity Title on the Activity Details Page
+                            jsonArray.add(0, activities.getActivitieName());
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -213,9 +244,10 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                 //Deletes the Loading Text when Activities appear
                 loadingText.setText("");
 
-                if(activityList.size() == 0) {
+                if(nonCompletedActivityList.size() == 0) {
                     loadingText.setText("No Activities");
                 }
+
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
                             R.layout.displayactivitylist, R.id.listText, jsonArray);
@@ -229,19 +261,21 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                         int itemPosition = position;
                         String  itemValue = (String) scrollView.getItemAtPosition(position);
 
-                        activityId = activityList.get(itemPosition).getId();
-                        activityDetailsTitle = activityList.get(itemPosition).getName();
-                        activityWeatherIcon = activityList.get(itemPosition).getWeatherIcon();
-                        activityWeatherSummary = activityList.get(itemPosition).getWeatherSummary();
-                        activityWeatherLow = activityList.get(itemPosition).getTempLow();
-                        activityWeatherHigh = activityList.get(itemPosition).getTempHigh();
-                        activityCategory = activityList.get(itemPosition).getCategory();
-                        activityGroup = activityList.get(itemPosition).getGroup();
+                        activityId = nonCompletedActivityList.get(itemPosition).getId();
+                        activityDetailsTitle = nonCompletedActivityList.get(itemPosition).getName();
+                        activityWeatherIcon = nonCompletedActivityList.get(itemPosition).getWeatherIcon();
+                        activityWeatherSummary = nonCompletedActivityList.get(itemPosition).getWeatherSummary();
+                        activityWeatherLow = nonCompletedActivityList.get(itemPosition).getTempLow();
+                        activityWeatherHigh = nonCompletedActivityList.get(itemPosition).getTempHigh();
+                        activityCategory = nonCompletedActivityList.get(itemPosition).getCategory();
+                        activityGroup = nonCompletedActivityList.get(itemPosition).getGroup();
+                        activityComplete = nonCompletedActivityList.get(itemPosition).getCompleted();
 
                         Intent showActivityPage = new Intent(getActivity(), ActivityDetails.class);
                         DisplayActivitiesTab.this.startActivity(showActivityPage);
                     }
                 });
+
             }
     }
 
@@ -266,9 +300,8 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     public static String getActivityCategory() {
         return activityCategory;
     }
-    public static String getActivityGroup() {
-        return activityGroup;
-    }
+    public static String getActivityGroup() { return activityGroup; }
+    public static String getActivityComplete() { return activityComplete; }
     public static List getActivityList() { return activityList; }
 
 }

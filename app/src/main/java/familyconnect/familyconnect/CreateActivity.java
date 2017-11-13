@@ -64,7 +64,7 @@ public class CreateActivity extends AppCompatActivity {
     private static Spinner weatherConditionDropdown, groupDropdown;
     private static MultiSlider weatherBar;
     private static View tempCircle;
-    private static int tempHigh = 0, tempLow = 0, rightProgressValue = 100, leftProgressValue = 0;
+    private static int tempHigh, tempLow, rightProgressValue, leftProgressValue;
     private boolean isProgressValue = false;
     private boolean POST = false;
     private static boolean isCreated = false;
@@ -247,6 +247,8 @@ public class CreateActivity extends AppCompatActivity {
 
         tempHigh = 100;
         tempLow = 0;
+        rightProgressValue = 100;
+        leftProgressValue = 0;
 
         weatherBar.setOnThumbValueChangeListener(new MultiSlider.OnThumbValueChangeListener() {
             @Override
@@ -342,13 +344,14 @@ public class CreateActivity extends AppCompatActivity {
                     String activityWeatherCondition = weatherConditionDropdownValue;
                     int high = tempHigh;
                     int low = tempLow;
+                    String completed = "false";
                     String site = "";
                     String created = "2017-10-29T22:12:17.391Z";
                     String updated = "2017-10-29T22:12:17.391Z";
 
                     String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id +
                             "&created_at=" + created + "&updated_at=" + updated + "&condition=" + activityWeatherCondition
-                            + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&url=" + site;
+                            + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&url=" + completed;
 
                     connection.setDoOutput(true);
 

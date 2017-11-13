@@ -35,7 +35,15 @@
             android:name=".ActivityDetails"
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".CreateActivity"></activity>
+        <activity android:name=".CreateActivity" />
+        <activity
+            android:name=".CompletedActivities"
+            android:label="Family Connect"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CompletedActivityDetails"
+            android:label="Family Connect"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
