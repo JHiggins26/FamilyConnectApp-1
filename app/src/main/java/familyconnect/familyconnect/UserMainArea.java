@@ -240,12 +240,6 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                    //                                                                  (KEY,       VALUE)
-                    //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
-                    //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
-                    //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
-                    //@OnStart for creating a new session (do POST to (/SESSION))
-                    //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
                     connection.setDoOutput(true);
                     connection.addRequestProperty("key", "value");
                     connection.setRequestMethod("GET");

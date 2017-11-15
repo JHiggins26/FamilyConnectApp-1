@@ -38,9 +38,6 @@ import java.util.Map;
 import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
 
-/**
- * The type Login.
- */
 public class Login extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleApiClient mGoogleApiClient;

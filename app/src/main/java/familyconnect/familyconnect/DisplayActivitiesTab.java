@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,8 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
