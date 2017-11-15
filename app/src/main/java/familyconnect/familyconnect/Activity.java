@@ -3,16 +3,24 @@ package familyconnect.familyconnect;
 
 public class Activity {
 
-    private String name, date, time, weather, category, groupName;
+    private String name, weatherIcon, weatherSummary, tempLow, tempHigh, group, category, completed;
+    private long id;
 
-    public Activity(String name, String date, String time, String weather, String category, String groupName) {
+    public Activity(long id, String name, String weatherIcon, String weatherSummary, String tempLow, String tempHigh, String category, String group, String completed) {
+        this.id = id;
         this.name = name;
-        this.date = date;
-        this.time = time;
-        this.weather = weather;
+        this.weatherIcon = weatherIcon;
+        this.weatherSummary = weatherSummary;
+        this.tempLow = tempLow;
+        this.tempHigh = tempHigh;
         this.category = category;
-        this.groupName = groupName;
+        this.group = group;
+        this.completed = completed;
     }
+
+    public long getId() { return id; }
+
+    public void setId(long id) { this.id = id; }
 
     public String getName() {
         return name;
@@ -22,27 +30,29 @@ public class Activity {
         this.name = name;
     }
 
-    public String getDate() {
-        return date;
+    public String getWeatherIcon() {
+        return weatherIcon;
     }
 
-    public void setDate(String date) { this.date = date; }
+    public void setWeatherIcon(String weatherIcon) { this.weatherIcon = weatherIcon; }
 
-    public String getTime() {
-        return time;
+    public String getWeatherSummary() {
+        return weatherSummary;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setWeatherSummary(String weatherSummary) { this.weatherSummary = weatherSummary; }
+
+    public String getTempLow() {
+        return tempLow;
     }
 
-    public String getWeather() {
-        return weather;
+    public void setTempLow(String tempLow) { this.tempLow = tempLow; }
+
+    public String getTempHigh() {
+        return tempHigh;
     }
 
-    public void setWeather(String weather) {
-        this.weather = weather;
-    }
+    public void setTempHigh(String tempHigh) { this.tempHigh = tempHigh; }
 
     public String getCategory() {
         return category;
@@ -52,13 +62,15 @@ public class Activity {
         this.category = category;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getGroup() {
+        return group;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
+    public void setGroup(String group) { this.group = group; }
+
+    public String getCompleted() { return completed; }
+
+    public void setCompleted(String completed) { this.completed = completed; }
 
     @Override
     public String toString() {

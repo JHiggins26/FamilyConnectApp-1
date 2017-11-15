@@ -21,6 +21,21 @@ public class FamilyConnectActivitiesHttpResponse {
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+    @SerializedName("condition")
+    @Expose
+    private String condition;
+    @SerializedName("category")
+    @Expose
+    private String category;
+    @SerializedName("tempHi")
+    @Expose
+    private String tempHi;
+    @SerializedName("tempLow")
+    @Expose
+    private String tempLow;
+    @SerializedName("url")
+    @Expose
+    private String url;
 
     public long getId() {
         return id;
@@ -60,6 +75,46 @@ public class FamilyConnectActivitiesHttpResponse {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getTempHi() {
+        return tempHi;
+    }
+
+    public void setTempHi(String tempHi) {
+        this.tempHi = tempHi;
+    }
+
+    public String getTempLow() {
+        return tempLow;
+    }
+
+    public void setTempLow(String tempLow) {
+        this.tempLow = tempLow;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

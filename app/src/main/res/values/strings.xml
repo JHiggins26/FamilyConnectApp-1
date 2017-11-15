@@ -8,4 +8,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_welcome">Welcome</string>
     <string name="title_activity_details">ActivityDetails</string>
+    <string name="title_activity_completed_activities">CompletedActivities</string>
+    <string name="title_activity_completed_details">CompletedActivityDetails</string>
 </resources>
