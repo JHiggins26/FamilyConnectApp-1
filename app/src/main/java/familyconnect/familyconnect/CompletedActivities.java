@@ -62,6 +62,8 @@ public class CompletedActivities extends AppCompatActivity {
         completedActivityNames = new ArrayList<String>();
 
 
+        completedActivityNames.clear();
+        completedActivityList.clear();
 
         for(int i = 0; i < DisplayActivitiesTab.getActivityList().size(); i++) {
 
