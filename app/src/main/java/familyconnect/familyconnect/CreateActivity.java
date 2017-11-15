@@ -77,10 +77,11 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         in_out_switch = (Switch) findViewById(R.id.in_out_switch);
 
         name = (EditText) findViewById(R.id.activityName);
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         groupDropdown = (Spinner) findViewById(R.id.groupDropdown);
         groupDropdownText = (TextView) findViewById(R.id.groupDropdownText);

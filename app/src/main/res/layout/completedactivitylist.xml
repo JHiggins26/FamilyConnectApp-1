@@ -34,12 +34,12 @@
 
 
     <ImageView
-        android:id="@+id/activity_Icon"
+        android:id="@+id/star_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/activity_icon"
+        android:background="@drawable/star_icon"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/listBGimage" />
 
