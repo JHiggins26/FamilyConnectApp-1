@@ -11,8 +11,17 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedInputStream;
@@ -23,6 +32,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
@@ -31,11 +42,14 @@ public class UserLoginActivity extends AppCompatActivity {
 
     private static final int REQUEST_SIGNUP = 0;
 
-    private EditText emailText;
+    private static EditText emailText;
     private EditText passwordText;
     private Button loginButton;
     private TextView signupLink;
-    private boolean GET, SUCCESS = false;
+    private RequestQueue queue;
+    private boolean GET, POST;
+    private static int ID;
+    private static String TOKEN;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +57,8 @@ public class UserLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_login);
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        queue = Volley.newRequestQueue(this);
 
         emailText = (EditText) findViewById(R.id.input_email);
         passwordText = (EditText) findViewById(R.id.input_password);
@@ -88,10 +104,12 @@ public class UserLoginActivity extends AppCompatActivity {
                 new Runnable() {
                     public void run() {
 
-                        UserLoginActivity.FamilyConnectFetchTask taskGet = new UserLoginActivity.FamilyConnectFetchTask();
-                        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
-                        taskGet.execute(uriGet);
-                        GET = true;
+                        UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
+                        //String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
+                        String uriPost ="https://family-connect-ggc-2017.herokuapp.com/sessions";
+                        task.execute(uriPost);
+                        //GET = true;
+                        POST = true;
 
                         progressDialog.dismiss();
                     }
@@ -208,16 +226,76 @@ public class UserLoginActivity extends AppCompatActivity {
                     for (FamilyConnectHttpResponse user : usr) {
 
                         if(user.getEmail().equalsIgnoreCase(emailText.getText().toString())) {
-                            SUCCESS = true;
+
+                            POST = true;
+
                             break;
                         }
                         else {
-                            SUCCESS = false;
+                            //SUCCESS = false;
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+            //POST REQUEST
+            if (POST) {
+
+                //                                                                  (KEY,       VALUE)
+                //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
+                //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
+
+                //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
+                //@OnStart for creating a new session (do POST to (/SESSION))
+                //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
+
+                StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
+                        new Response.Listener<String>()
+                        {
+                            @Override
+                            public void onResponse(String response) {
+
+                                String jsonRequest [ ] = response.split(",");
+
+                                ID = Integer.parseInt(jsonRequest[0].substring(6, jsonRequest[0].toString().length()));
+                                TOKEN = jsonRequest[2].substring(24, jsonRequest[2].toString().length()-2);
+
+                                Log.v("ID", jsonRequest[0].substring(6, jsonRequest[0].toString().length()));
+                                Log.v("TOKEN", jsonRequest[2].substring(24, jsonRequest[2].toString().length()-2));
+
+                                Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
+                                UserLoginActivity.this.startActivity(homePage);
+
+                                onLoginSuccess();
+
+                                Log.d("POST REQUEST", response);
+                            }
+                        },
+                        new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                onLoginFailed();
+
+                                Log.d("Error.Response", "" + error);
+                            }
+                        }
+                ) {
+
+                    //PASS PARAMETERS
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String>  params = new HashMap<String, String>();
+                        params.put("email", emailText.getText().toString().toLowerCase());
+                        params.put("password", passwordText.getText().toString());
+
+                        return params;
+                    }
+                };
+                queue.add(postRequest);
             }
 
             return null;
@@ -228,17 +306,18 @@ public class UserLoginActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
-
-            if(SUCCESS) {
-                Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
-                UserLoginActivity.this.startActivity(homePage);
-
-                onLoginSuccess();
-            }
-            else {
-
-                onLoginFailed();
-            }
         }
+    }
+
+    public static String getToken() {
+        return TOKEN;
+    }
+
+    public static String getEmail() {
+        return emailText.getText().toString();
+    }
+
+    public static int getID() {
+        return ID;
     }
 }

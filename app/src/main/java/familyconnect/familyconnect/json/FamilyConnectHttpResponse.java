@@ -12,15 +12,18 @@ public class FamilyConnectHttpResponse {
     @SerializedName("user_name")
     @Expose
     private String userName;
-    @SerializedName("email")
-    @Expose
-    private String email;
     @SerializedName("created_at")
     @Expose
     private String createdAt;
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+    @SerializedName("email")
+    @Expose
+    private String email;
+    @SerializedName("authentication_token")
+    @Expose
+    private String authenticationToken;
 
     public long getId() {
         return id;
@@ -38,14 +41,6 @@ public class FamilyConnectHttpResponse {
         this.userName = userName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getCreatedAt() {
         return createdAt;
     }
@@ -60,6 +55,22 @@ public class FamilyConnectHttpResponse {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAuthenticationToken() {
+        return authenticationToken;
+    }
+
+    public void setAuthenticationToken(String authenticationToken) {
+        this.authenticationToken = authenticationToken;
     }
 
 }

@@ -116,8 +116,7 @@ public class CreateActivity extends AppCompatActivity {
                     isCreated = true;
 
                     CreateActivity.FamilyConnectFetchTask taskPost = new CreateActivity.FamilyConnectFetchTask();
-                    String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
-                    //String uriPost ="https://myprojects-mikeh87.c9users.io/users/1/activities";
+                    String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
                     taskPost.execute(uriPost);
                     POST = true;
 
@@ -336,6 +335,10 @@ public class CreateActivity extends AppCompatActivity {
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     connection.setRequestMethod("POST");
+                    connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.addRequestProperty("X-Email", UserLoginActivity.getEmail());
+                    connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
+                    connection.setDoOutput(true);
 
                     // Read in the data to PUT in the database
                     int user_id = 1;

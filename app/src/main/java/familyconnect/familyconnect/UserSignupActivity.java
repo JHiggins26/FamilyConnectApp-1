@@ -134,7 +134,7 @@ public class UserSignupActivity extends AppCompatActivity {
             emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4) {
+        if (password.isEmpty() || password.length() < 5) {
             passwordText.setError("Password must be greater than 4 alphanumeric characters");
             valid = false;
         } else {
@@ -162,6 +162,18 @@ public class UserSignupActivity extends AppCompatActivity {
             //POST REQUEST
             if (POST) {
 
+                //PASS IN HEADER
+                 /*   @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        //headers.put("Content-Type", "application/json; charset=UTF-8");
+                        // headers.put("X-Email", emailText.getText().toString());
+                        // headers.put("X-Password", passwordText.getText().toString());
+                        // headers.put("X-User-Token", "TOKEN");
+
+                        return headers;
+                    }*/
+
                 //                                                                  (KEY,       VALUE)
                 //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
                 //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
@@ -175,7 +187,6 @@ public class UserSignupActivity extends AppCompatActivity {
                         {
                             @Override
                             public void onResponse(String response) {
-                                // response
                                 Log.d("POST", response);
                             }
                         },
@@ -188,17 +199,6 @@ public class UserSignupActivity extends AppCompatActivity {
                             }
                         }
                 ) {
-
-                    //PASS IN HEADER
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        headers.put("Content-Type", "application/json; charset=UTF-8");
-                        //headers.put("X-Email", "EMAIL");
-                        //headers.put("X-User-Token", "TOKEN");
-
-                        return headers;
-                    }
 
                     //PASS PARAMETERS
                     @Override
