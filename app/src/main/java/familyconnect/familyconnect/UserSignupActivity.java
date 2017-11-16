@@ -29,6 +29,7 @@ public class UserSignupActivity extends AppCompatActivity {
     private EditText nameText;
     private EditText emailText;
     private EditText passwordText;
+    private EditText confirm_passwordText;
     private Button signupButton;
     private TextView loginLink;
     private RequestQueue queue;
@@ -45,6 +46,7 @@ public class UserSignupActivity extends AppCompatActivity {
         nameText = (EditText) findViewById(R.id.input_name);
         emailText = (EditText) findViewById(R.id.input_email);
         passwordText = (EditText) findViewById(R.id.input_password);
+        confirm_passwordText = (EditText) findViewById(R.id.input_confirm_password);
         signupButton = (Button) findViewById(R.id.btn_signup);
         loginLink = (TextView) findViewById(R.id.link_login);
 
@@ -115,6 +117,8 @@ public class UserSignupActivity extends AppCompatActivity {
         String name = nameText.getText().toString();
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
+        String confirm_password = confirm_passwordText.getText().toString();
+
 
         if (name.isEmpty() || name.length() < 3) {
             nameText.setError("Username must be at least 3 characters");
@@ -135,6 +139,13 @@ public class UserSignupActivity extends AppCompatActivity {
             valid = false;
         } else {
             passwordText.setError(null);
+        }
+
+        if (confirm_password.isEmpty() || (!confirm_password.equals(password))) {
+            confirm_passwordText.setError("Confirm password does not match the password");
+            valid = false;
+        } else {
+            confirm_passwordText.setError(null);
         }
 
         return valid;
@@ -182,7 +193,7 @@ public class UserSignupActivity extends AppCompatActivity {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String> headers = new HashMap<String, String>();
-                        //headers.put("Content-Type", "application/json; charset=UTF-8");
+                        headers.put("Content-Type", "application/json; charset=UTF-8");
                         //headers.put("X-Email", "EMAIL");
                         //headers.put("X-User-Token", "TOKEN");
 
@@ -195,6 +206,8 @@ public class UserSignupActivity extends AppCompatActivity {
                         Map<String, String>  params = new HashMap<String, String>();
                         params.put("user_name", nameText.getText().toString());
                         params.put("email", emailText.getText().toString());
+                        params.put("password", passwordText.getText().toString());
+                        params.put("password_confirmation", confirm_passwordText.getText().toString());
 
                         return params;
                     }
