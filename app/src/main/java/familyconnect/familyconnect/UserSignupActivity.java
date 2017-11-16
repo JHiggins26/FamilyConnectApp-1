@@ -29,6 +29,7 @@ public class UserSignupActivity extends AppCompatActivity {
     private EditText nameText;
     private EditText emailText;
     private EditText passwordText;
+    private EditText confirm_passwordText;
     private Button signupButton;
     private TextView loginLink;
     private RequestQueue queue;
@@ -45,6 +46,7 @@ public class UserSignupActivity extends AppCompatActivity {
         nameText = (EditText) findViewById(R.id.input_name);
         emailText = (EditText) findViewById(R.id.input_email);
         passwordText = (EditText) findViewById(R.id.input_password);
+        confirm_passwordText = (EditText) findViewById(R.id.input_confirm_password);
         signupButton = (Button) findViewById(R.id.btn_signup);
         loginLink = (TextView) findViewById(R.id.link_login);
 
@@ -115,6 +117,8 @@ public class UserSignupActivity extends AppCompatActivity {
         String name = nameText.getText().toString();
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
+        String confirm_password = confirm_passwordText.getText().toString();
+
 
         if (name.isEmpty() || name.length() < 3) {
             nameText.setError("Username must be at least 3 characters");
@@ -130,11 +134,18 @@ public class UserSignupActivity extends AppCompatActivity {
             emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4) {
+        if (password.isEmpty() || password.length() < 5) {
             passwordText.setError("Password must be greater than 4 alphanumeric characters");
             valid = false;
         } else {
             passwordText.setError(null);
+        }
+
+        if (confirm_password.isEmpty() || (!confirm_password.equals(password))) {
+            confirm_passwordText.setError("Confirm password does not match the password");
+            valid = false;
+        } else {
+            confirm_passwordText.setError(null);
         }
 
         return valid;
@@ -151,6 +162,18 @@ public class UserSignupActivity extends AppCompatActivity {
             //POST REQUEST
             if (POST) {
 
+                //PASS IN HEADER
+                 /*   @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        //headers.put("Content-Type", "application/json; charset=UTF-8");
+                        // headers.put("X-Email", emailText.getText().toString());
+                        // headers.put("X-Password", passwordText.getText().toString());
+                        // headers.put("X-User-Token", "TOKEN");
+
+                        return headers;
+                    }*/
+
                 //                                                                  (KEY,       VALUE)
                 //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
                 //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
@@ -164,7 +187,6 @@ public class UserSignupActivity extends AppCompatActivity {
                         {
                             @Override
                             public void onResponse(String response) {
-                                // response
                                 Log.d("POST", response);
                             }
                         },
@@ -178,23 +200,14 @@ public class UserSignupActivity extends AppCompatActivity {
                         }
                 ) {
 
-                    //PASS IN HEADER
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        //headers.put("Content-Type", "application/json; charset=UTF-8");
-                        //headers.put("X-Email", "EMAIL");
-                        //headers.put("X-User-Token", "TOKEN");
-
-                        return headers;
-                    }
-
                     //PASS PARAMETERS
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String>  params = new HashMap<String, String>();
                         params.put("user_name", nameText.getText().toString());
                         params.put("email", emailText.getText().toString());
+                        params.put("password", passwordText.getText().toString());
+                        params.put("password_confirmation", confirm_passwordText.getText().toString());
 
                         return params;
                     }

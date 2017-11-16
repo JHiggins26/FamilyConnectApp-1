@@ -110,7 +110,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         GET = true;
 
         DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
+        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
         taskGet.execute(uriGet);
     }
 
@@ -129,7 +129,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             GET = true;
 
             DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
+            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
             taskGet.execute(uriGet);
 
             if(CreateActivitiesTab.getIsCreated()) {
@@ -186,6 +186,10 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
+                    connection.addRequestProperty("Content-Type", "application/json");
+                    connection.addRequestProperty("X-User-Email", UserLoginActivity.getEmail());
+                    connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
+
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder json = new StringBuilder();
@@ -210,9 +214,6 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     }
 
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
-
-                        //JsonArray is just for the Individual Activity Title on the Activity Details Page
-                        //jsonArray.add(0, activities.getActivitieName());
 
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(),"ICON", activities.getCondition(),
                                 activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getUrl());

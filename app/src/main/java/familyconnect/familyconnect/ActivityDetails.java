@@ -102,7 +102,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = false;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
                                 taskGet.execute(uriDelete);
                             }
                         })
@@ -131,7 +131,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = true;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
                                 taskGet.execute(uriDelete);
                             }
                         })
@@ -250,7 +250,8 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                     public Map<String, String> getHeaders() {
                         Map<String, String> headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/json");
-                        headers.put("Accept", "application/json");
+                        headers.put("X-User-Email", UserLoginActivity.getEmail());
+                        headers.put("X-User-Token", UserLoginActivity.getToken());
 
                         return headers;
                     }
@@ -301,7 +302,19 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 Log.d("Error.Response", error.toString());
                             }
                         }
-                );
+                ) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        headers.put("X-User-Email", UserLoginActivity.getEmail());
+                        headers.put("X-User-Token", UserLoginActivity.getToken());
+
+                        return headers;
+                    }
+                };
+
+
 
                 queue.add(deleteRequest);
             }
