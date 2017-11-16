@@ -186,10 +186,10 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
-                    connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    connection.addRequestProperty("X-Email", UserLoginActivity.getEmail());
+                    connection.addRequestProperty("Content-Type", "application/json");
+                    connection.addRequestProperty("X-User-Email", UserLoginActivity.getEmail());
                     connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
-                    connection.setDoOutput(true);
+
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder json = new StringBuilder();

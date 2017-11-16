@@ -125,15 +125,7 @@ public class CreateActivity extends AppCompatActivity {
 
                     DisplayActivitiesTab tab = new DisplayActivitiesTab();
 
-                   // Intent displayActivityPage = new Intent(CreateActivity.this, GroupedActivities.class);
-                    //CreateActivity.this.startActivity(displayActivityPage);
-
-                   // displayActivityPage.putExtra("DisplayActivities", 2);
-                   // startActivity(displayActivityPage);
                     isUpdated = true;
-
-
-
                 }
             }
         });
@@ -333,15 +325,14 @@ public class CreateActivity extends AppCompatActivity {
                 try {
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     connection.setRequestMethod("POST");
-                    connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    connection.addRequestProperty("X-Email", UserLoginActivity.getEmail());
+                    //connection.addRequestProperty("Content-Type", "application/json");
+                    connection.addRequestProperty("X-User-Email", UserLoginActivity.getEmail());
                     connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
                     connection.setDoOutput(true);
 
                     // Read in the data to PUT in the database
-                    int user_id = 1;
+                    int user_id = UserLoginActivity.getID();
                     String activityName = name.getText().toString();
                     String activityCategory = in_out_switch.getText().toString();
                     String activityGroupName = groupDropdownValue;
@@ -350,14 +341,10 @@ public class CreateActivity extends AppCompatActivity {
                     int low = tempLow;
                     String completed = "false";
                     String site = "";
-                    String created = "2017-10-29T22:12:17.391Z";
-                    String updated = "2017-10-29T22:12:17.391Z";
 
-                    String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id +
-                            "&created_at=" + created + "&updated_at=" + updated + "&condition=" + activityWeatherCondition
+                    String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id + "&condition=" + activityWeatherCondition
                             + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&url=" + completed;
 
-                    connection.setDoOutput(true);
 
                     DataOutputStream dataStream = new DataOutputStream(connection.getOutputStream());
 
