@@ -3,10 +3,11 @@ package familyconnect.familyconnect;
 
 public class Activity {
 
-    private String name, weatherIcon, weatherSummary, tempLow, tempHigh, group, category, completed;
+    private String name, weatherIcon, weatherSummary, tempLow, tempHigh, group, category;
+    private boolean completed;
     private long id;
 
-    public Activity(long id, String name, String weatherIcon, String weatherSummary, String tempLow, String tempHigh, String category, String group, String completed) {
+    public Activity(long id, String name, String weatherIcon, String weatherSummary, String tempLow, String tempHigh, String category, String group, boolean completed) {
         this.id = id;
         this.name = name;
         this.weatherIcon = weatherIcon;
@@ -68,9 +69,9 @@ public class Activity {
 
     public void setGroup(String group) { this.group = group; }
 
-    public String getCompleted() { return completed; }
+    public boolean getCompleted() { return completed; }
 
-    public void setCompleted(String completed) { this.completed = completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
 
     @Override
     public String toString() {

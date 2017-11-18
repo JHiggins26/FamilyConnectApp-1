@@ -53,7 +53,8 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     protected List<String> jsonArray;
     public static List<Activity> activityList, nonCompletedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
-            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup, activityComplete;
+            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
+    private static boolean activityComplete;
     private static long activityId;
     private TextView completedActivitiesBtn;
     private ImageView starBtn;
@@ -215,13 +216,13 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
 
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
-                        Activity activity = new Activity(activities.getId(), activities.getActivitieName(),"ICON", activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getUrl());
+                        Activity activity = new Activity(activities.getId(), activities.getActivitieName(),activities.getIcon(), activities.getCondition(),
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getIsCompleted());
 
                         activityList.add(0, activity);
 
                         //A check to only display Activities that are not completed yet
-                        if(activities.getUrl().matches("false")) {
+                        if(activities.getIsCompleted() == false) {
 
                             nonCompletedActivityList.add(0, activity);
 
@@ -292,9 +293,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     public static String getActivityWeatherIcon() {
         return activityWeatherIcon;
     }
-    public static String getActivityWeatherSummary() {
-        return activityWeatherSummary;
-    }
+    public static String getActivityWeatherSummary() { return activityWeatherSummary; }
     public static String getActivityWeatherLow() {
         return activityWeatherLow;
     }
@@ -305,7 +304,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         return activityCategory;
     }
     public static String getActivityGroup() { return activityGroup; }
-    public static String getActivityComplete() { return activityComplete; }
+    public static boolean getActivityComplete() { return activityComplete; }
     public static List getActivityList() { return activityList; }
 
 }

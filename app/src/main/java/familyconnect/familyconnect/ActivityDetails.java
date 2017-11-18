@@ -73,7 +73,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
 
 
         activityTitle.setText(DisplayActivitiesTab.getActivityDetailsTitle() + " Details");
-        setWeatherImage("partly-cloudy-day");
+        setWeatherImage(DisplayActivitiesTab.getActivityWeatherIcon());
         weatherSummary.setText(DisplayActivitiesTab.getActivityWeatherSummary());
         lowTemp.setText(DisplayActivitiesTab.getActivityWeatherLow() + " °F");
         highTemp.setText(DisplayActivitiesTab.getActivityWeatherHigh() + " °F");
@@ -176,34 +176,29 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                 weatherIcon.setImageResource(R.drawable.cloudy_icon);
                 break;
 
-//            case "rain":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "sleet":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "snow":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "wind":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "fog":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
+            case "rain":
 
-            default:
+                weatherIcon.setImageResource(R.drawable.rain_icon);
+                break;
 
-               // weatherIcon.setImageResource(R.drawable.);
+            case "sleet":
+
+                weatherIcon.setImageResource(R.drawable.sleet_icon);
+                break;
+
+            case "snow":
+
+                weatherIcon.setImageResource(R.drawable.snow_icon);
+                break;
+
+            case "wind":
+
+                weatherIcon.setImageResource(R.drawable.wind_icon);
+                break;
+
+            case "fog":
+
+                weatherIcon.setImageResource(R.drawable.fog_icon);
                 break;
         }
     }
@@ -222,7 +217,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                 final JSONObject jsonObject = new JSONObject();
 
                 try {
-                    jsonObject.put("url", "true");
+                    jsonObject.put("isCompleted", true);
 
                 }  catch (JSONException je) {
                     je.printStackTrace();

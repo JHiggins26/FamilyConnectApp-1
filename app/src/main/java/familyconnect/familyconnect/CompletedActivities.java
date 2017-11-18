@@ -47,7 +47,8 @@ public class CompletedActivities extends AppCompatActivity {
     private List<String> completedActivityNames;
     private List<Activity> completedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
-            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup, activityComplete;
+            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
+    private static boolean activityComplete;
     private static long activityId;
 
 
@@ -67,14 +68,14 @@ public class CompletedActivities extends AppCompatActivity {
 
         for(int i = 0; i < DisplayActivitiesTab.getActivityList().size(); i++) {
 
-            if(DisplayActivitiesTab.activityList.get(i).getCompleted().matches("true")) {
+            if(DisplayActivitiesTab.activityList.get(i).getCompleted() == true) {
 
                 completedActivityNames.add(DisplayActivitiesTab.activityList.get(i).getName());
 
                 Activity activity = new Activity(DisplayActivitiesTab.activityList.get(i).getId(), DisplayActivitiesTab.activityList.get(i).getName(),
-                        "ICON", DisplayActivitiesTab.activityList.get(i).getWeatherSummary(), DisplayActivitiesTab.activityList.get(i).getTempLow(),
-                        DisplayActivitiesTab.activityList.get(i).getTempHigh(), DisplayActivitiesTab.activityList.get(i).getCategory(),
-                        "N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
+                        DisplayActivitiesTab.activityList.get(i).getWeatherIcon(), DisplayActivitiesTab.activityList.get(i).getWeatherSummary(),
+                        DisplayActivitiesTab.activityList.get(i).getTempLow(), DisplayActivitiesTab.activityList.get(i).getTempHigh(),
+                        DisplayActivitiesTab.activityList.get(i).getCategory(),"N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
 
                 completedActivityList.add(activity);
             }
@@ -131,6 +132,6 @@ public class CompletedActivities extends AppCompatActivity {
         return activityCategory;
     }
     public static String getActivityGroup() { return activityGroup; }
-    public static String getActivityComplete() { return activityComplete; }
+    public static boolean getActivityComplete() { return activityComplete; }
 
 }

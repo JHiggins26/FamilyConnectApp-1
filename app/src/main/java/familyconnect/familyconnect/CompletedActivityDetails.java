@@ -66,7 +66,7 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
 
 
         activityTitle.setText(CompletedActivities.getActivityDetailsTitle() + " Details");
-        setWeatherImage("partly-cloudy-day");
+        setWeatherImage(CompletedActivities.getActivityWeatherIcon());
         weatherSummary.setText(CompletedActivities.getActivityWeatherSummary());
         lowTemp.setText(CompletedActivities.getActivityWeatherLow() + " °F");
         highTemp.setText(CompletedActivities.getActivityWeatherHigh() + " °F");
@@ -139,34 +139,29 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                 weatherIcon.setImageResource(R.drawable.cloudy_icon);
                 break;
 
-//            case "rain":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "sleet":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "snow":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "wind":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "fog":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
+            case "rain":
 
-            default:
+                weatherIcon.setImageResource(R.drawable.rain_icon);
+                break;
 
-                // weatherIcon.setImageResource(R.drawable.);
+            case "sleet":
+
+                weatherIcon.setImageResource(R.drawable.sleet_icon);
+                break;
+
+            case "snow":
+
+                weatherIcon.setImageResource(R.drawable.snow_icon);
+                break;
+
+            case "wind":
+
+                weatherIcon.setImageResource(R.drawable.wind_icon);
+                break;
+
+            case "fog":
+
+                weatherIcon.setImageResource(R.drawable.fog_icon);
                 break;
         }
     }

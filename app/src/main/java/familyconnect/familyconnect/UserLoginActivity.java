@@ -20,10 +20,15 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,9 +52,10 @@ public class UserLoginActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView signupLink;
     private RequestQueue queue;
-    private boolean GET, POST;
+    private boolean GET, POST = false;
     private static int ID;
     private static String TOKEN;
+    private static String username;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +94,7 @@ public class UserLoginActivity extends AppCompatActivity {
     public void login() {
 
         if (!validate()) {
-            onLoginFailed();
+
             return;
         }
 
@@ -97,23 +103,28 @@ public class UserLoginActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(UserLoginActivity.this,
                 R.style.AppTheme_PopupOverlay);//AppTheme_Dark_Dialog
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
+        progressDialog.setMessage("Signing in...");
         progressDialog.show();
+
+        UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
+        String uriPost ="https://family-connect-ggc-2017.herokuapp.com/sessions";
+        task.execute(uriPost);
+        POST = true;
+        GET = false;
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
 
                         UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
-                        //String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
-                        String uriPost ="https://family-connect-ggc-2017.herokuapp.com/sessions";
-                        task.execute(uriPost);
-                        //GET = true;
-                        POST = true;
+                        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
+                        task.execute(uriGet);
+                        POST = false;
+                        GET = true;
 
                         progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 3500);
     }
 
 
@@ -140,6 +151,8 @@ public class UserLoginActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
+        passwordText.setText("");
+
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
 
         loginButton.setEnabled(true);
@@ -158,8 +171,8 @@ public class UserLoginActivity extends AppCompatActivity {
             emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() <= 4) {
-            passwordText.setError("Password must be greater than 4 alphanumeric characters");
+        if (password.isEmpty()) {
+            passwordText.setError("Please enter a password");
             valid = false;
         } else {
             passwordText.setError(null);
@@ -187,65 +200,8 @@ public class UserLoginActivity extends AppCompatActivity {
 
             Log.v("FamilyConnect", "URL = " + params[0]);
 
-            //GET REQUEST
-            if (GET) {
-
-                try {
-                    String line;
-                    URL url = new URL(params[0]);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                  /*  connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    connection.addRequestProperty("X-Email", "EMAIL");
-                    connection.addRequestProperty("X-User-Token", "TOKEN");
-                    connection.setDoOutput(true);
-                   */
-                    InputStream in = new BufferedInputStream(connection.getInputStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder json = new StringBuilder();
-
-
-                    while ((line = reader.readLine()) != null) {
-                        json.append(line);
-                    }
-
-                    //Trims braces at the beginning and end of the string
-                    String jsonTrim = json.toString().substring(1, json.toString().length() - 1);
-
-                    Log.v("String", "" + jsonTrim);
-
-                    Scanner scanJ = new Scanner(jsonTrim);
-                    scanJ.useDelimiter("[}]");
-
-                    ArrayList<FamilyConnectHttpResponse> usr = new ArrayList<FamilyConnectHttpResponse>();
-
-                    while (scanJ.hasNext()) {
-                        usr.add(getTask(scanJ.next() + "}"));
-                    }
-
-                    for (FamilyConnectHttpResponse user : usr) {
-
-                        if(user.getEmail().equalsIgnoreCase(emailText.getText().toString())) {
-
-                            POST = true;
-
-                            break;
-                        }
-                        else {
-                            //SUCCESS = false;
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
             //POST REQUEST
             if (POST) {
-
-                //                                                                  (KEY,       VALUE)
-                //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
-                //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
 
                 //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
                 //@OnStart for creating a new session (do POST to (/SESSION))
@@ -262,13 +218,9 @@ public class UserLoginActivity extends AppCompatActivity {
                                 ID = Integer.parseInt(jsonRequest[0].substring(6, jsonRequest[0].toString().length()));
                                 TOKEN = jsonRequest[2].substring(24, jsonRequest[2].toString().length()-2);
 
+
                                 Log.v("ID", jsonRequest[0].substring(6, jsonRequest[0].toString().length()));
                                 Log.v("TOKEN", jsonRequest[2].substring(24, jsonRequest[2].toString().length()-2));
-
-                                Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
-                                UserLoginActivity.this.startActivity(homePage);
-
-                                onLoginSuccess();
 
                                 Log.d("POST REQUEST", response);
                             }
@@ -298,6 +250,53 @@ public class UserLoginActivity extends AppCompatActivity {
                 queue.add(postRequest);
             }
 
+
+            //GET REQUEST FOR USERNAME
+            if (GET) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0] + "/" + ID, jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                                try {
+                                    username = response.getString("user_name");
+
+                                    Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
+                                    UserLoginActivity.this.startActivity(homePage);
+
+                                    onLoginSuccess();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                onLoginFailed();
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                ) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        headers.put("X-User-Email", emailText.getText().toString());
+                        headers.put("X-User-Token", TOKEN);
+
+                        return headers;
+                    }
+                };
+                queue.add(getRequest);
+            }
+
             return null;
         }
 
@@ -317,7 +316,10 @@ public class UserLoginActivity extends AppCompatActivity {
         return emailText.getText().toString();
     }
 
-    public static int getID() {
-        return ID;
+    public static int getID() { return ID; }
+
+    public static String getUsername() {
+        return username;
     }
+
 }

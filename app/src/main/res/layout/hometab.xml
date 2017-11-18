@@ -1,12 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="familyconnect.familyconnect.GroupedActivities$PlaceholderFragment"
-    android:id="@+id/relativeLayout3">
+    android:background="#ebebeb"
+    android:fillViewport="true"
+    tools:context="familyconnect.familyconnect.GroupedActivities$PlaceholderFragment">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:background="@drawable/homepage_backdrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/welcomeTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/open_sans_bold"
+            android:text="Family Connect"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="40dp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.120000005" />
+
+        <TextView
+            android:id="@+id/usernameTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Welcome, User!"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="35dp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/welcomeTitle"
+            app:layout_constraintVertical_bias="0.9" />
+
+        <ImageButton
+            android:id="@+id/settings_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/settings_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-</android.support.constraint.ConstraintLayout>
+        <ImageView
+            android:id="@+id/listBGimage"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:background="#62E37A"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"></ImageView>
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/arrow"
+            app:layout_constraintEnd_toEndOf="@+id/listBGimage"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/listBGimage" />
+
+
+        <ImageView
+            android:id="@+id/activity_icon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/activity_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/listBGimage" />
+
+        <TextView
+            android:id="@+id/listText"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily=""
+            android:text="View Activities"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/listBGimage" />
+
+        <ImageView
+            android:id="@+id/calendarBGimage"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:background="#FF7877"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listBGimage"></ImageView>
+
+        <ImageView
+            android:id="@+id/calendar_arrow"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/arrow"
+            app:layout_constraintEnd_toEndOf="@+id/listBGimage"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listBGimage" />
+
+
+        <ImageView
+            android:id="@+id/calendar_icon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/calendar_icon"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listBGimage" />
+
+        <TextView
+            android:id="@+id/calendar_text"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily=""
+            android:text="Find A Future Activity"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/calendarBGimage" />
+
+
+        <ImageButton
+            android:id="@+id/suggest_daily_activity_icon"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/suggest_activity_icon2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/daily_text"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:text="Daily Activity"
+            android:textAlignment="center"
+            android:textColor="#0c59cf"
+            android:textSize="30dp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintEnd_toEndOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintStart_toStartOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintTop_toTopOf="@+id/suggest_daily_activity_icon" />
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/suggest_future_activity_icon"-->
+            <!--android:layout_width="140dp"-->
+            <!--android:layout_height="140dp"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:layout_marginEnd="8dp"-->
+            <!--android:layout_marginTop="8dp"-->
+            <!--android:background="@drawable/suggest_activity_icon"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintHorizontal_bias="1.0"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/listBGimage"-->
+            <!--app:layout_constraintVertical_bias="1.0" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/future_text"-->
+            <!--android:layout_width="140dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Future Activity"-->
+            <!--android:textAlignment="center"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:textSize="30dp"-->
+            <!--android:textStyle="italic"-->
+            <!--app:layout_constraintBottom_toBottomOf="@+id/suggest_future_activity_icon"-->
+            <!--app:layout_constraintEnd_toEndOf="@+id/suggest_future_activity_icon"-->
+            <!--app:layout_constraintStart_toStartOf="@+id/suggest_future_activity_icon"-->
+            <!--app:layout_constraintTop_toTopOf="@+id/suggest_future_activity_icon" />-->
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</ScrollView>

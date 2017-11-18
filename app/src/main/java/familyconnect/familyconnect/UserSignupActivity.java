@@ -134,8 +134,8 @@ public class UserSignupActivity extends AppCompatActivity {
             emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 5) {
-            passwordText.setError("Password must be greater than 4 alphanumeric characters");
+        if (password.isEmpty() || password.length() <= 5) {
+            passwordText.setError("Password must contain at least 6 or more alphanumeric characters");
             valid = false;
         } else {
             passwordText.setError(null);
@@ -205,7 +205,7 @@ public class UserSignupActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() {
                         Map<String, String>  params = new HashMap<String, String>();
                         params.put("user_name", nameText.getText().toString());
-                        params.put("email", emailText.getText().toString());
+                        params.put("email", emailText.getText().toString().toLowerCase());
                         params.put("password", passwordText.getText().toString());
                         params.put("password_confirmation", confirm_passwordText.getText().toString());
 

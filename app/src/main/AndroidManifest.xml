@@ -17,6 +17,9 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".UserLoginActivity">
+        <!--<activity android:name=".GroupedActivities"-->
+            <!--android:label="Family Connect"-->
+            <!--android:theme="@style/AppTheme.NoActionBar">-->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,15 +30,7 @@
 
         <activity android:name=".UserSignupActivity"></activity>
 
-        <!--<activity android:name=".Login">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
-        <activity android:name=".UserMainArea" />
         <activity
             android:name=".GroupedActivities"
             android:label="Family Connect"
@@ -57,6 +52,10 @@
             android:name=".CompletedActivityDetails"
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
     </application>
 

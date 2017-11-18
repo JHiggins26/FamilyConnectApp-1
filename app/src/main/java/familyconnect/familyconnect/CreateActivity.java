@@ -70,6 +70,7 @@ public class CreateActivity extends AppCompatActivity {
     private static boolean isCreated = false;
     private String groupDropdownValue, weatherConditionDropdownValue;
     private static boolean isUpdated = false;
+    private String weatherIcon;
 
 
     @Override
@@ -217,6 +218,18 @@ public class CreateActivity extends AppCompatActivity {
                 weatherConditionDropdownText.setBackgroundColor(Color.WHITE);
                 weatherConditionDropdownValue = weatherConditionDropdown.getSelectedItem().toString();
 
+                if(weatherConditionDropdownValue.matches("Clear Day")) { weatherIcon = "clear-day"; }
+                else if(weatherConditionDropdownValue.matches("Clear Night")) { weatherIcon = "clear-night"; }
+                else if(weatherConditionDropdownValue.matches("Partly Cloudy Day")) { weatherIcon = "partly-cloudy-day"; }
+                else if(weatherConditionDropdownValue.matches("Partly Cloudy Night")) { weatherIcon = "partly-cloudy-night"; }
+                else if(weatherConditionDropdownValue.matches("Cloudy")) { weatherIcon = "cloudy"; }
+                else if(weatherConditionDropdownValue.matches("Rain")) { weatherIcon = "rain"; }
+                else if(weatherConditionDropdownValue.matches("Sleet")) { weatherIcon = "sleet"; }
+                else if(weatherConditionDropdownValue.matches("Snow")) { weatherIcon = "snow"; }
+                else if(weatherConditionDropdownValue.matches("Wind")) { weatherIcon = "wind"; }
+                else if(weatherConditionDropdownValue.matches("Fog")) { weatherIcon = "fog"; }
+
+
                 int index = weatherConditionDropdown.getSelectedItemPosition();
 
                 if(index > 0) {
@@ -339,11 +352,11 @@ public class CreateActivity extends AppCompatActivity {
                     String activityWeatherCondition = weatherConditionDropdownValue;
                     int high = tempHigh;
                     int low = tempLow;
-                    String completed = "false";
-                    String site = "";
+                    boolean completed = false;
+                    String icon = weatherIcon;
 
                     String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id + "&condition=" + activityWeatherCondition
-                            + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&url=" + completed;
+                            + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&isCompleted=" + completed + "&icon=" + icon;
 
 
                     DataOutputStream dataStream = new DataOutputStream(connection.getOutputStream());

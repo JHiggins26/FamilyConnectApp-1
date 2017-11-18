@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 public class GroupedActivities extends AppCompatActivity {
 
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -34,7 +35,7 @@ public class GroupedActivities extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -96,7 +97,7 @@ public class GroupedActivities extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -153,5 +154,9 @@ public class GroupedActivities extends AppCompatActivity {
 
     public static ViewPager getViewPager() {
         return mViewPager;
+    }
+
+    public static SectionsPagerAdapter getmSectionsPagerAdapter() {
+        return mSectionsPagerAdapter;
     }
 }
