@@ -321,6 +321,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
+            HomeTab.setRunOnce(true);
             Intent displayActivityPage = new Intent(ActivityDetails.this, GroupedActivities.class);
             ActivityDetails.this.startActivity(displayActivityPage);
 

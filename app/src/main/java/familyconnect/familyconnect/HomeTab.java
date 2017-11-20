@@ -3,10 +3,14 @@ package familyconnect.familyconnect;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -24,13 +28,40 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Timer;
+
+import familyconnect.familyconnect.Widgets.DatePickerFragment;
+import familyconnect.familyconnect.Widgets.TimePickerFragment;
+import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 
 public class HomeTab extends Fragment implements View.OnClickListener {
 
-    private TextView username;
+    private TextView username, degrees;
     private ImageButton settings;
     private PopupWindow settingsWindow;
     private LayoutInflater layoutInflater;
@@ -45,14 +76,27 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
     private Animation animRotate, animScale;
     private AnimationSet setAnim;
-    private ImageButton dailyBtn, futureBtn;
+    private ImageButton dailyBtn;
 
     private MediaPlayer dailyActivitySound;
+
+    private boolean isWeather = false;
+    private RequestQueue queue;
+    private double longitude, latitude;
+    private GPSLocation gps;
+    private static String temperature = " ", summary, icon;
+    private static boolean RUN_ONCE = true;
+
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.hometab, container, false);
+
+        queue = Volley.newRequestQueue(getActivity());
+
+        degrees = rootView.findViewById(R.id.degrees);
 
         settings = rootView.findViewById(R.id.settings_icon);
         settings.setOnClickListener(this);
@@ -84,9 +128,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         dailyBtn = rootView.findViewById(R.id.suggest_daily_activity_icon);
         dailyBtn.setOnClickListener(this);
 
-//        futureBtn = rootView.findViewById(R.id.suggest_future_activity_icon);
-//        futureBtn.setOnClickListener(this);
-
         //Animations
         animRotate = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_rotate);
         animScale = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_scale);
@@ -97,8 +138,29 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         dailyActivitySound = MediaPlayer.create(getActivity(), R.raw.daily_activity_sound);
 
+        getGPSLocation();
+        getWeather();
+
 
         return rootView;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+
+            if (RUN_ONCE) {
+                RUN_ONCE = false;
+            }
+            else  {
+                getGPSLocation();
+                getWeather();
+            }
+        }
+        else {
+            //Do Nothing
+        }
     }
 
 
@@ -130,6 +192,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                                 .setMessage("Are you sure you want to Log Out?")
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
+                                        RUN_ONCE = true;
                                         Intent loginPage = new Intent(getActivity(), UserLoginActivity.class);
                                         HomeTab.this.startActivity(loginPage);
                                     }
@@ -197,11 +260,148 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                         new Runnable() {
                             public void run() {
 
-                                //DO Intent HERE to get Activity
+                                Intent suggestedActivityPage = new Intent(getActivity(), SuggestedDailyActivity.class);
+                                HomeTab.this.startActivity(suggestedActivityPage);
                             }
                         }, 1200);
                 break;
 
         }
+    }
+
+
+    public void getWeather() {
+
+        isWeather = true;
+
+        HomeTab.FamilyConnectFetchTask taskPost = new HomeTab.FamilyConnectFetchTask();
+        //URI REQUEST: DOMAIN   /KEY   /LAT,LON
+        String uriGetForecast = "https://api.darksky.net/forecast/879da94f7c402798f1bf303383070b27/" + latitude + "," + longitude;
+
+        taskPost.execute(uriGetForecast);
+    }
+
+
+    public void getGPSLocation() {
+
+        gps = new GPSLocation(getActivity());
+        Location location = gps.getLocation();
+
+        if(location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            /*Toast.makeText(getActivity(), "Your Location is - \nLat: " +
+                    latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();*/
+        }
+        else {
+            android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(getActivity());
+            // Setting Dialog Title
+            alertDialog.setTitle("GPS Settings");
+            // Setting Dialog Message
+            alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+            // On pressing Settings button
+            alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,int which) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+            // on pressing cancel button
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            // Showing Alert Message
+            alertDialog.show();
+        }
+    }
+
+
+    private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+
+            Log.v("FamilyConnect", "URL = " + params[0]);
+
+            //GET REQUEST FOR WEATHER
+            if (isWeather) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                                try {
+                                    JSONObject hourly = response.getJSONObject("hourly");
+                                    summary = hourly.getString("summary");
+                                    //icon = hourly.getString("icon");
+
+                                    JSONArray data = hourly.getJSONArray("data");
+
+                                    //JSONObject summaryObj = data.getJSONObject(0);
+                                    //summary = summaryObj.getString("summary");
+
+                                    JSONObject iconObj = data.getJSONObject(1);
+                                    icon = iconObj.getString("icon");
+
+                                    JSONObject tempObj = data.getJSONObject(2);
+                                    temperature = tempObj.getString("temperature");
+
+                                    degrees.setText(((int)Double.parseDouble(temperature)) + " °F");
+
+                                    Log.v("Summary", summary + ", ICON " + icon);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                );
+                queue.add(getRequest);
+            }
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+        }
+    }
+
+
+    public static String getTemperature() {
+        return temperature;
+    }
+
+    public static String getIcon() {
+        return icon;
+    }
+
+    public static String getSummary() {
+        return summary;
+    }
+
+    public static boolean getRunOnce() {
+        return RUN_ONCE;
+    }
+
+    public static void setRunOnce(boolean RUN_ONCE) {
+        HomeTab.RUN_ONCE = RUN_ONCE;
     }
 }

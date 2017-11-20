@@ -75,6 +75,6 @@ public class Activity {
 
     @Override
     public String toString() {
-        return "";
+        return name + ", " + weatherIcon + ", " + weatherSummary + ", " + tempLow + ", " + tempHigh + ", " + category + ", " + group + ", " + completed + "\n";
     }
 }

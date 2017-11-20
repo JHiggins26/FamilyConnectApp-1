@@ -222,6 +222,7 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
+            HomeTab.setRunOnce(true);
             Intent displayActivityPage = new Intent(CompletedActivityDetails.this, GroupedActivities.class);
             CompletedActivityDetails.this.startActivity(displayActivityPage);
 

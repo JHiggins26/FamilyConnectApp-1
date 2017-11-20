@@ -44,6 +44,7 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 public class CompletedActivities extends AppCompatActivity {
 
     private static ListView scrollView;
+    private TextView completedText;
     private List<String> completedActivityNames;
     private List<Activity> completedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
@@ -58,10 +59,14 @@ public class CompletedActivities extends AppCompatActivity {
         setContentView(R.layout.activity_completed_activities);
 
         scrollView = (ListView) findViewById(R.id.activityScroll);
+        completedText = (TextView) findViewById(R.id.no_completed_activity);
 
         completedActivityList = new ArrayList<Activity>();
         completedActivityNames = new ArrayList<String>();
 
+        if(DisplayActivitiesTab.getActivityList().size() == 0) {
+            completedText.setText("No Completed Activities");
+        }
 
         completedActivityNames.clear();
         completedActivityList.clear();
@@ -78,6 +83,12 @@ public class CompletedActivities extends AppCompatActivity {
                         DisplayActivitiesTab.activityList.get(i).getCategory(),"N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
 
                 completedActivityList.add(activity);
+
+                completedText.setText("");
+
+            }
+            else {
+                completedText.setText("No Completed Activities");
             }
         }
 
