@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -226,6 +227,14 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                         params.put("created", "2017-10-29T22:12:17.391Z");
                         params.put("updated", "2017-10-29T22:12:17.391Z");
 
+                        return params;
+                    }
+
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Content-Type", "application/json; charset=UTF-8");
+                        params.put("token", "TOKEN");
                         return params;
                     }
                 };

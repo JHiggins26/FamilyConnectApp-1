@@ -1,20 +1,28 @@
 package familyconnect.familyconnect;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -34,44 +42,94 @@ import familyconnect.familyconnect.Widgets.DatePickerFragment;
 import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
-public class DisplayActivitiesTab extends Fragment {
 
+public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+
+    private SwipeRefreshLayout swipeRefreshLayout;
     private static ListView scrollView;
     private TextView loadingText;
     private RequestQueue queue;
     private boolean GET = false;
-    private List<String> jsonArray;
-    private static String activityDetailsTitle;
+    protected List<String> jsonArray;
+    public static List<Activity> activityList, nonCompletedActivityList;
+    private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
+            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup, activityComplete;
+    private static long activityId;
+    private TextView completedActivitiesBtn;
+    private ImageView starBtn;
+
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+
+        swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         scrollView = rootView.findViewById(R.id.activityScroll);
         loadingText = rootView.findViewById(R.id.loading);
 
-        jsonArray = new ArrayList<String>();
+        completedActivitiesBtn = rootView.findViewById(R.id.completedActivities);
+        completedActivitiesBtn.setOnClickListener(this);
 
-        queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        starBtn = rootView.findViewById(R.id.star_icon);
+        starBtn.setOnClickListener(this);
+
+        jsonArray = new ArrayList<String>();
+        activityList = new ArrayList<Activity>();
+        nonCompletedActivityList = new ArrayList<Activity>();
+
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent createActivityPage = new Intent(getActivity(), CreateActivity.class);
+                DisplayActivitiesTab.this.startActivity(createActivityPage);
+            }
+        });
 
         return rootView;
     }
+
+
+    @Override
+    public void onRefresh() {
+
+        loadingText.setText("Loading Activities...");
+
+        //Clear JSON and Activity array to Sync the list
+        jsonArray.clear();
+        activityList.clear();
+
+        GET = true;
+
+        DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
+        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+        taskGet.execute(uriGet);
+    }
+
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
 
+            loadingText.setText("Loading Activities...");
+
+            //Clear JSON and Activity array to Sync the list
+            jsonArray.clear();
+            activityList.clear();
+
             GET = true;
 
-            //Clear JSON
-            jsonArray.clear();
-
             DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/1/activities";
-            //String uriGet ="https://myprojects-mikeh87.c9users.io/users";
+            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
             taskGet.execute(uriGet);
 
             if(CreateActivitiesTab.getIsCreated()) {
@@ -90,9 +148,16 @@ public class DisplayActivitiesTab extends Fragment {
             }
         }
         else {
-
+            //Do Nothing
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        Intent completedActivityPage = new Intent(getActivity(), CompletedActivities.class);
+        DisplayActivitiesTab.this.startActivity(completedActivityPage);
+    }
+
 
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
@@ -116,13 +181,15 @@ public class DisplayActivitiesTab extends Fragment {
             //GET REQUEST
             if (GET) {
 
-                //Alternative GET Method
-
                 try {
                     String line;
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
+                    connection.addRequestProperty("Content-Type", "application/json");
+                    connection.addRequestProperty("X-User-Email", UserLoginActivity.getEmail());
+                    connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
+
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder json = new StringBuilder();
@@ -140,70 +207,31 @@ public class DisplayActivitiesTab extends Fragment {
                     Scanner scanJ = new Scanner(jsonTrim);
                     scanJ.useDelimiter("[}]");
 
-                    ArrayList<FamilyConnectActivitiesHttpResponse> rets = new ArrayList<FamilyConnectActivitiesHttpResponse>();
+                    ArrayList<FamilyConnectActivitiesHttpResponse> act = new ArrayList<FamilyConnectActivitiesHttpResponse>();
 
                     while(scanJ.hasNext()){
-                        rets.add(getTask(scanJ.next() + "}"));
+                        act.add(getTask(scanJ.next() + "}"));
                     }
 
-                    for(FamilyConnectActivitiesHttpResponse activities : rets) {
+                    for(FamilyConnectActivitiesHttpResponse activities : act) {
 
-                        jsonArray.add(0, activities.getActivitieName());
-                        Log.v("Activity Objects", "" + activities);
+                        Activity activity = new Activity(activities.getId(), activities.getActivitieName(),"ICON", activities.getCondition(),
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getUrl());
+
+                        activityList.add(0, activity);
+
+                        //A check to only display Activities that are not completed yet
+                        if(activities.getUrl().matches("false")) {
+
+                            nonCompletedActivityList.add(0, activity);
+
+                            //JsonArray is just for the Individual Activity Title on the Activity Details Page
+                            jsonArray.add(0, activities.getActivitieName());
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-                //Alternate GET Method (THE BEST WAY, HOWEVER BRACES THROW JSON PARSE ERROR)
-                /*final JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
-                        new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                // response
-                                try {
-
-                                    String name = response.toString().substring(1,response.toString().length()-1);
-                                    String name2 = response.getString("activitie_name");
-
-                                    list.setText(name2);
-
-
-                                } catch (JSONException e) {
-
-                                }
-
-
-
-                                Log.d("GET", response.toString().substring(1,response.toString().length()-1));
-
-                                //Format JSON into Object
-                              /*  Gson gson = new Gson();
-                                JsonReader jsonReader = new JsonReader(new StringReader(response.toString()));
-                                jsonReader.setLenient(true);
-
-                                FamilyConnectActivitiesHttpResponse httpResponse =
-                                        gson.fromJson(jsonReader, FamilyConnectActivitiesHttpResponse.class);
-
-                                //String activityName = httpResponse.getActivitieName();
-                                //list.setText(activityName);
-                                //Log.v("Activity Name", activityName);
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // error
-                                Log.d("Error.Response", error.toString());
-
-                            }
-                        }
-                );
-
-                queue.add(getRequest);*/
             }
 
                 return null;
@@ -214,35 +242,70 @@ public class DisplayActivitiesTab extends Fragment {
             protected void onPostExecute (Bitmap bitmap){
                 super.onPostExecute(bitmap);
 
+                // stopping swipe refresh
+                swipeRefreshLayout.setRefreshing(false);
+
                 //Deletes the Loading Text when Activities appear
                 loadingText.setText("");
 
+                if(nonCompletedActivityList.size() == 0) {
+                    loadingText.setText("No Activities");
+                }
+
+
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
-                        R.layout.listtext, R.id.listText, jsonArray);
+                            R.layout.displayactivitylist, R.id.listText, jsonArray);
 
                 scrollView.setAdapter(arrayAdapter);
 
                 scrollView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         int itemPosition = position;
                         String  itemValue = (String) scrollView.getItemAtPosition(position);
 
-                            activityDetailsTitle = jsonArray.get(itemPosition) + " Details";
-                            //Toast.makeText(getActivity().getApplicationContext(),jsonArray.get(itemPosition), Toast.LENGTH_SHORT).show();
-
+                        activityId = nonCompletedActivityList.get(itemPosition).getId();
+                        activityDetailsTitle = nonCompletedActivityList.get(itemPosition).getName();
+                        activityWeatherIcon = nonCompletedActivityList.get(itemPosition).getWeatherIcon();
+                        activityWeatherSummary = nonCompletedActivityList.get(itemPosition).getWeatherSummary();
+                        activityWeatherLow = nonCompletedActivityList.get(itemPosition).getTempLow();
+                        activityWeatherHigh = nonCompletedActivityList.get(itemPosition).getTempHigh();
+                        activityCategory = nonCompletedActivityList.get(itemPosition).getCategory();
+                        activityGroup = nonCompletedActivityList.get(itemPosition).getGroup();
+                        activityComplete = nonCompletedActivityList.get(itemPosition).getCompleted();
 
                         Intent showActivityPage = new Intent(getActivity(), ActivityDetails.class);
                         DisplayActivitiesTab.this.startActivity(showActivityPage);
-
-                        //Toast.makeText(getActivity().getApplicationContext(),"Position :"+itemPosition+"  Activity : " +itemValue , Toast.LENGTH_LONG).show();
                     }
                 });
 
             }
     }
 
+    public static long getActivityId() {
+        return activityId;
+    }
     public static String getActivityDetailsTitle() {
         return activityDetailsTitle;
     }
+    public static String getActivityWeatherIcon() {
+        return activityWeatherIcon;
+    }
+    public static String getActivityWeatherSummary() {
+        return activityWeatherSummary;
+    }
+    public static String getActivityWeatherLow() {
+        return activityWeatherLow;
+    }
+    public static String getActivityWeatherHigh() {
+        return activityWeatherHigh;
+    }
+    public static String getActivityCategory() {
+        return activityCategory;
+    }
+    public static String getActivityGroup() { return activityGroup; }
+    public static String getActivityComplete() { return activityComplete; }
+    public static List getActivityList() { return activityList; }
+
 }

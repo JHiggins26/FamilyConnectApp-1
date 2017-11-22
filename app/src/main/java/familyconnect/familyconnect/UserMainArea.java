@@ -234,11 +234,14 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
                 final JSONObject jsonObject = new JSONObject();
 
                 //Alternative GET Method
-                /*
+
                 try {
                     String line;
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                    connection.setDoOutput(true);
+                    connection.addRequestProperty("key", "value");
                     connection.setRequestMethod("GET");
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -261,7 +264,7 @@ public class UserMainArea extends AppCompatActivity implements View.OnClickListe
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                */
+
 
                 JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0] + "/3", jsonObject,
                         new Response.Listener<JSONObject>() {

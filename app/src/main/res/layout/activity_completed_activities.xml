@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="familyconnect.familyconnect.Welcome">
+    tools:context="familyconnect.familyconnect.CompletedActivities">
 
-    <include layout="@layout/content_welcome" />
+
+
+    <include layout="@layout/content_completed_activities" />
 
 
 </android.support.design.widget.CoordinatorLayout>

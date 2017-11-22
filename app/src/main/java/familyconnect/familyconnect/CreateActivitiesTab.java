@@ -54,7 +54,8 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
     private static EditText name, date, time, weather, category, group = null;
 
-    private String readName, readDate, readTime, readWeather, readCategory, readGroup = null;
+    private String readName, readDate, readTime, readAllWeather, readWeatherDegrees, readWeatherSummary,
+            readWeatherIcon, readCategory, readGroup = null;
     private boolean POST, GET = false;
     private static boolean isCreated = false;
     private RequestQueue queue;
@@ -63,25 +64,19 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
     private static Button weatherButton;
 
-    private static ArrayList<Activity> activitiesList = new ArrayList<Activity>();
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.createactivitiestab, container, false);
 
         name = rootView.findViewById(R.id.activityName);
-        name.setShowSoftInputOnFocus(false);
         date = rootView.findViewById(R.id.activityDate);
         time = rootView.findViewById(R.id.activityTime);
         weather = rootView.findViewById(R.id.activityWeather);
         category = rootView.findViewById(R.id.activityCategory);
-        category.setShowSoftInputOnFocus(false);
         group = rootView.findViewById(R.id.activityGroup);
-        group.setShowSoftInputOnFocus(false);
         weatherButton = rootView.findViewById(R.id.weatherButton);
 
-
-        //Allows Text Field to be clicked
+        //Allows Text Fields to be clicked
         date.setOnClickListener(this);
         time.setOnClickListener(this);
 
@@ -91,6 +86,8 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
         queue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
+        getGPSLocation();
+
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,22 +96,18 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                 readName = name.getText().toString();
                 readDate = date.getText().toString();
                 readTime = time.getText().toString();
-                readWeather = weather.getText().toString();
+                readAllWeather = weather.getText().toString();
                 readCategory = category.getText().toString();
                 readGroup = group.getText().toString();
 
 
-                if (readName.matches("") || readDate.matches("") || readTime.matches("") || readWeather.matches("")
-                        || readCategory.matches("") || readGroup.matches("")) {
+                if (readName.matches("") || readDate.matches("") || readTime.matches("") || readAllWeather.matches("") ||
+                        readAllWeather.matches("Loading Temperature...") || readWeatherDegrees != null || readWeatherIcon != null ||
+                        readCategory.matches("") || readGroup.matches("")) {
 
                     Snackbar.make(view, "Please fill out activity fields!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
-                    Log.v("Created", "ReadName: " + readName + ", ReadDate: " + readDate + ", ReadTime: " + readTime
-                    + ", ReadWeather: " + readWeather + ", ReadCategory: " + readCategory + ", ReadGroup: " + readGroup);
-
-                    Activity activity = new Activity(readName, readDate, readTime, readWeather, readCategory, readGroup);
-                    activitiesList.add(activity);
 
                     isCreated = true;
 
@@ -131,7 +124,6 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
             }
         });
 
-        getGPSLocation();
         return rootView;
     }
 
@@ -164,6 +156,11 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
         Log.v("URI" ,uriGet);
         taskPost.execute(uriGet);
+
+        if((!date.getText().toString().matches("")) && (!time.getText().toString().matches(""))) {
+            weather.setText("Loading Temperature...");
+        }
+
         GET = true;
         POST = false;
     }
@@ -182,11 +179,11 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
     public void getGPSLocation() {
 
         gps = new GPSLocation(getActivity().getApplicationContext());
-        Location l = gps.getLocation();
+        Location location = gps.getLocation();
 
-        if(l != null) {
-            latitude = l.getLatitude();
-            longitude = l.getLongitude();
+        if(location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
 
             Toast.makeText(getActivity().getApplicationContext(), "Your Location is - \nLat: " +
                     latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
@@ -235,6 +232,13 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                     // Read in the data
                     int user_id = 1;
                     String activityName = readName;
+                    String activityDate = readDate;
+                    String activityTime = readTime;
+                    String activityWeatherDegrees = readWeatherDegrees;
+                    String activityWeatherSummary = readWeatherSummary;
+                    String activityWeatherIcon = readWeatherIcon;
+                    String activityCategory = readCategory;
+                    String activityGroupName = readGroup;
                     String created = "2017-10-29T22:12:17.391Z";
                     String updated = "2017-10-29T22:12:17.391Z";
 
@@ -259,6 +263,7 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                     e.printStackTrace();
                 }
             }
+
             //GET REQUEST FOR WEATHER
             if (GET) {
 
@@ -273,11 +278,12 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                                 try {
                                     JSONObject currently = response.getJSONObject("currently");
 
-                                    int temperature = currently.getInt("temperature");
-                                    String summary = currently.getString("summary");
+                                    readWeatherDegrees = String.valueOf(currently.getInt("temperature"));
+                                    readWeatherSummary = currently.getString("summary");
+                                    readWeatherIcon = currently.getString("icon");
 
-                                    weather.setText("The temperature at " + TimePickerFragment.getTime() + " is " + (temperature) + " °F" + "\n" +
-                                    "Condition: " + summary);
+                                    weather.setText("The temperature at " + TimePickerFragment.getTime() + " is " + readWeatherDegrees + " °F" + "\n" +
+                                    "Condition: " + readWeatherSummary);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -293,7 +299,6 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
                 );
                 queue.add(getRequest);
             }
-
 
             return null;
         }
@@ -364,10 +369,6 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
 
     public static Button getWeatherButton() {
         return weatherButton;
-    }
-
-    public static ArrayList<Activity> getActivitiesList() {
-        return activitiesList;
     }
 
 }
