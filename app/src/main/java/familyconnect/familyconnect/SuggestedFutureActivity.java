@@ -1,36 +1,18 @@
 package familyconnect.familyconnect;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -40,22 +22,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Set;
 
 import familyconnect.familyconnect.Widgets.DatePickerFragment;
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
-import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
-public class SuggestedDailyActivity extends AppCompatActivity implements View.OnClickListener{
+public class SuggestedFutureActivity extends AppCompatActivity implements View.OnClickListener{
 
     private boolean isActivity, isActivityFound = false;
-    private TextView weatherTemp, weatherCondition, weatherSummary, activityTitle, tapSuggestion;
+    private TextView date, weatherTemp, weatherCondition, weatherSummary, activityTitle, tapSuggestion;
     private ImageButton activityImage;
 
     private String activityName, activityCondition, activityTempLow, activityTempHigh;
@@ -71,8 +47,9 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_suggested_daily);
+        setContentView(R.layout.activity_suggested_future);
 
+        date = findViewById(R.id.date_text);
         weatherTemp = findViewById(R.id.weather_temp);
         weatherCondition = findViewById(R.id.weather_condition);
         weatherSummary = findViewById(R.id.weather_summary);
@@ -112,8 +89,8 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
 
         isActivity = true;
 
-        SuggestedDailyActivity.FamilyConnectFetchTask taskPost = new SuggestedDailyActivity.FamilyConnectFetchTask();
-        String uriGetActivity ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+        SuggestedFutureActivity.FamilyConnectFetchTask taskPost = new SuggestedFutureActivity.FamilyConnectFetchTask();
+        String uriGetActivity ="https://family-connect-ggc-2017.herokuapp.com/users";
 
         taskPost.execute(uriGetActivity);
     }
@@ -141,7 +118,7 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
 
                 try {
                     String line;
-                    URL url = new URL(params[0]);
+                    URL url = new URL(params[0] + "/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.addRequestProperty("Content-Type", "application/json");
@@ -176,19 +153,18 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(), activities.getIcon(), activities.getCondition(),
                                 activities.getTempLow(), activities.getTempHi(), activities.getCategory(), HomeTab.getGroupName(), activities.getIsCompleted());
 
-                        //Filter Temperature
-                        if((Double.parseDouble(HomeTab.getTemperature()) >= Double.parseDouble(activities.getTempLow()) &&
-                                Double.parseDouble(HomeTab.getTemperature()) <= Double.parseDouble(activities.getTempHi()))
+                        //Filter temperature
+                        if((HomeTab.getFutureTemperatureLow() >= Double.parseDouble(activities.getTempLow()) &&
+                                HomeTab.getFutureTemperatureHigh() <= Double.parseDouble(activities.getTempHi()))
                                 || (activities.getCondition().equals("Indoors"))) {
 
                             //Filter Weather Status
-                            if(HomeTab.getIcon().equals(activities.getIcon()) || activities.getIcon().equals("Indoors")) {
+                            if(HomeTab.getFutureIcon().equals(activities.getIcon()) || activities.getIcon().equals("Indoors")) {
 
                                 //Filter If Activity Has Not Been Completed
-                                if(activities.getIsCompleted() == false) {
+                                if(!activities.getIsCompleted())
                                     isActivityFound = true;
                                     suggestedList.add(activity.toString());
-                                }
                             }
                         }
                     }
@@ -231,10 +207,12 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
+            date.setText("Date: " + DatePickerFragment.getUniformDateFormat());
+
             if(isActivityFound) {
                 weatherTemp.setText("Temperature: " + "High: " + ((int) Double.parseDouble(activityTempHigh)) + "°F " + "Low: " + ((int) Double.parseDouble(activityTempLow)) + "°F");
                 weatherCondition.setText("Weather Condition:" + activityCondition);
-                weatherSummary.setText("Weather Summary: " + HomeTab.getSummary());
+                weatherSummary.setText("Weather Summary: " + HomeTab.getFutureSummary());
                 activityTitle.setText(activityName);
             }
             else {
@@ -246,9 +224,8 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     @Override
     public void onBackPressed() {
         HomeTab.setRunOnce(true);
-        Intent homePage = new Intent(SuggestedDailyActivity.this, GroupedActivities.class);
-        SuggestedDailyActivity.this.startActivity(homePage);
+        Intent homePage = new Intent(SuggestedFutureActivity.this, GroupedActivities.class);
+        SuggestedFutureActivity.this.startActivity(homePage);
 
     }
-
 }

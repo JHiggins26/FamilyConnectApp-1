@@ -1,6 +1,7 @@
 package familyconnect.familyconnect.Widgets;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -13,7 +14,9 @@ import java.util.Calendar;
 import android.widget.TimePicker;
 
 import familyconnect.familyconnect.CreateActivitiesTab;
+import familyconnect.familyconnect.HomeTab;
 import familyconnect.familyconnect.R;
+import familyconnect.familyconnect.SuggestedFutureActivity;
 
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
@@ -38,8 +41,6 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
         //This variable plugs into the weather api URL
         specialTimeFormat = hourOfDay +":" + minute + ":00";
-
-        EditText textField = (EditText) getActivity().findViewById(R.id.activityTime);
 
         aMpM = "AM";
 
@@ -114,9 +115,8 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
             }
         }
 
-        textField.setText("Time: " + time);
+        HomeTab.getFutureBtn().performClick();
 
-        CreateActivitiesTab.getWeatherButton().performClick();
     }
 
 

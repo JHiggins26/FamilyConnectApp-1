@@ -35,7 +35,7 @@ import java.util.Map;
 public class CompletedActivityDetails extends AppCompatActivity implements View.OnClickListener {
 
     private TextView activityTitle, weatherSummary, highTemp, lowTemp, group, category;
-    private Button buttonDelete;
+    private Button buttonDelete, buttonAdd;
     private ImageView weatherIcon;
     private boolean PUT, DELETE = false;
     private RequestQueue queue;
@@ -61,6 +61,9 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
 
         buttonDelete = (Button) findViewById(R.id.x_button);
         buttonDelete.setOnClickListener(this);
+
+        buttonAdd = (Button) findViewById(R.id.add_button);
+        buttonAdd.setOnClickListener(this);
 
         queue = Volley.newRequestQueue(this);
 
@@ -95,8 +98,36 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                                 PUT = false;
 
                                 CompletedActivityDetails.FamilyConnectFetchTask taskGet = new CompletedActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
                                 taskGet.execute(uriDelete);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                break;
+
+            case R.id.add_button:
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(this);
+                }
+                builder.setTitle("Re-Add Activity")
+                        .setMessage("Are you sure you want to re-add this " + CompletedActivities.getActivityDetailsTitle() + " activity?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                DELETE = false;
+                                PUT = true;
+
+                                CompletedActivityDetails.FamilyConnectFetchTask taskGet = new CompletedActivityDetails.FamilyConnectFetchTask();
+                                String uriPut ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+                                taskGet.execute(uriPut);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -163,6 +194,11 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
 
                 weatherIcon.setImageResource(R.drawable.fog_icon);
                 break;
+
+            case "Indoors":
+
+                weatherIcon.setImageResource(R.drawable.indoor_icon);
+                break;
         }
     }
 
@@ -213,6 +249,66 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                 };
 
                 queue.add(deleteRequest);
+            }
+
+            //PUT REQUEST
+            if (PUT) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                try {
+                    jsonObject.put("isCompleted", false);
+
+                }  catch (JSONException je) {
+                    je.printStackTrace();
+                }
+
+                JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, params[0] + "/" + CompletedActivities.getActivityId(), jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                // response
+                                Log.d("PUT", response.toString());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                ) {
+
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        headers.put("X-User-Email", UserLoginActivity.getEmail());
+                        headers.put("X-User-Token", UserLoginActivity.getToken());
+
+                        return headers;
+                    }
+
+                    @Override
+                    public byte[] getBody() {
+
+                        try {
+                            return jsonObject.toString().getBytes("UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json";
+                    }
+                };
+
+                queue.add(putRequest);
             }
 
             return null;

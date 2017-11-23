@@ -102,7 +102,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = false;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
                                 taskGet.execute(uriDelete);
                             }
                         })
@@ -131,8 +131,8 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = true;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
-                                taskGet.execute(uriDelete);
+                                String uriPut ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+                                taskGet.execute(uriPut);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -199,6 +199,11 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
             case "fog":
 
                 weatherIcon.setImageResource(R.drawable.fog_icon);
+                break;
+
+            case "Indoors":
+
+                weatherIcon.setImageResource(R.drawable.indoor_icon);
                 break;
         }
     }
@@ -309,8 +314,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                     }
                 };
 
-
-
                 queue.add(deleteRequest);
             }
 
@@ -326,7 +329,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
             ActivityDetails.this.startActivity(displayActivityPage);
 
         }
-
     }
 
 }

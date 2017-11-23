@@ -59,7 +59,7 @@ import io.apptik.widget.MultiSlider;
 public class CreateActivity extends AppCompatActivity {
 
     private static EditText name;
-    private static TextView tempPercent, tempStatus, weatherConditionDropdownText, groupDropdownText;
+    private static TextView tempPercent, tempStatus, weatherConditionDropdownText;
     private static Switch in_out_switch;
     private static Spinner weatherConditionDropdown, groupDropdown;
     private static MultiSlider weatherBar;
@@ -69,7 +69,7 @@ public class CreateActivity extends AppCompatActivity {
     private boolean POST = false;
     private static boolean isCreated = false;
     private String groupDropdownValue, weatherConditionDropdownValue;
-    private static boolean isUpdated = false;
+    private static boolean isUpdated = false, isOutdoor = true;
     private String weatherIcon;
 
 
@@ -84,9 +84,6 @@ public class CreateActivity extends AppCompatActivity {
 
         name = (EditText) findViewById(R.id.activityName);
 
-        groupDropdown = (Spinner) findViewById(R.id.groupDropdown);
-        groupDropdownText = (TextView) findViewById(R.id.groupDropdownText);
-
         weatherConditionDropdown = (Spinner) findViewById(R.id.weatherConditionDropdown);
         weatherConditionDropdownText = (TextView) findViewById(R.id.weatherDropdownText);
 
@@ -96,7 +93,6 @@ public class CreateActivity extends AppCompatActivity {
 
 
         setIndoorOutdoor();
-        setGroupDropdown();
         setWeatherConditionDropdown();
         getTemperatureDegrees();
 
@@ -107,8 +103,7 @@ public class CreateActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Checking to see if User Inputs are filled out
                 if (name.getText().toString().matches("") ||
-                        groupDropdownText.getText().toString().matches("Select a group") ||
-                        weatherConditionDropdownText.getText().toString().matches("Select a weather condition")) {
+                        (weatherConditionDropdownText.getText().toString().matches("Select a weather condition") && isOutdoor == true)) {
 
                     Snackbar.make(view, "Please fill out activity fields!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -117,7 +112,7 @@ public class CreateActivity extends AppCompatActivity {
                     isCreated = true;
 
                     CreateActivity.FamilyConnectFetchTask taskPost = new CreateActivity.FamilyConnectFetchTask();
-                    String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+                    String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
                     taskPost.execute(uriPost);
                     POST = true;
 
@@ -144,65 +139,42 @@ public class CreateActivity extends AppCompatActivity {
                     tempStatus.setBackgroundColor(Color.WHITE);
                     tempStatus.setText("Temperature Disabled Indoors");
 
+                    weatherConditionDropdown.setSelection(0);
+                    weatherConditionDropdown.setEnabled(false);
+                    weatherConditionDropdownText.setText("Select a weather condition");
+                    weatherConditionDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
+                    weatherConditionDropdownText.getBackground().setAlpha(80);
+                    weatherConditionDropdownValue = "Indoors";
+                    weatherIcon = "Indoors";
                     tempHigh = 0;
                     tempLow = 0;
+                    isOutdoor = false;
                 }
                 else {
                     in_out_switch.setText("Outdoor Activity");
                     weatherBar.setEnabled(true);
                     tempStatus.setText("Set Outdoor Temperature");
 
+                    weatherConditionDropdown.setEnabled(true);
+                    weatherConditionDropdownText.getBackground().setAlpha(255);
+                    weatherConditionDropdownText.setText("Select a weather condition");
+                    weatherConditionDropdownValue = "";
                     tempHigh = rightProgressValue;
                     tempLow = leftProgressValue;
+                    isOutdoor = true;
                 }
             }
         });
     }
 
-
-    public void setGroupDropdown() {
-
-        ArrayList<String> options = new ArrayList<String>();
-        options.add("");
-        options.add("Group 1"); options.add("Group 2");
-        options.add("Group 3"); options.add("Group 4");
-        options.add("Group 5"); options.add("Create a Group");
-
-        final ArrayAdapter<String> adapterList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options);
-        groupDropdown.setAdapter(adapterList);
-
-        groupDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                groupDropdownText.setBackgroundColor(Color.WHITE);
-                groupDropdownValue = groupDropdown.getSelectedItem().toString();
-
-                int index = groupDropdown.getSelectedItemPosition();
-
-                if(index > 0) {
-                    groupDropdownText.setText("");
-                }
-                else {
-                    groupDropdownText.setText("Select a group");
-                    groupDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
 
 
     public void setWeatherConditionDropdown() {
 
         ArrayList<String> options = new ArrayList<String>();
         options.add("");
+        options.add("Partly Cloudy Day (Common)"); options.add("Partly Cloudy Night (Common)");
         options.add("Clear Day"); options.add("Clear Night");
-        options.add("Partly Cloudy Day"); options.add("Partly Cloudy Night");
         options.add("Cloudy"); options.add("Rain");
         options.add("Sleet"); options.add("Snow");
         options.add("Wind"); options.add("Fog");
@@ -215,29 +187,41 @@ public class CreateActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                weatherConditionDropdownText.setBackgroundColor(Color.WHITE);
                 weatherConditionDropdownValue = weatherConditionDropdown.getSelectedItem().toString();
 
-                if(weatherConditionDropdownValue.matches("Clear Day")) { weatherIcon = "clear-day"; }
-                else if(weatherConditionDropdownValue.matches("Clear Night")) { weatherIcon = "clear-night"; }
-                else if(weatherConditionDropdownValue.matches("Partly Cloudy Day")) { weatherIcon = "partly-cloudy-day"; }
-                else if(weatherConditionDropdownValue.matches("Partly Cloudy Night")) { weatherIcon = "partly-cloudy-night"; }
-                else if(weatherConditionDropdownValue.matches("Cloudy")) { weatherIcon = "cloudy"; }
-                else if(weatherConditionDropdownValue.matches("Rain")) { weatherIcon = "rain"; }
-                else if(weatherConditionDropdownValue.matches("Sleet")) { weatherIcon = "sleet"; }
-                else if(weatherConditionDropdownValue.matches("Snow")) { weatherIcon = "snow"; }
-                else if(weatherConditionDropdownValue.matches("Wind")) { weatherIcon = "wind"; }
-                else if(weatherConditionDropdownValue.matches("Fog")) { weatherIcon = "fog"; }
+                if(weatherConditionDropdownValue.equals("Partly Cloudy Day (Common)")) {
+                    weatherConditionDropdownValue = "Partly Cloudy Day";
+                    weatherIcon = "partly-cloudy-day";
+                }
+                else if(weatherConditionDropdownValue.equals("Partly Cloudy Night (Common)")) {
+                    weatherConditionDropdownValue = "Partly Cloudy Night";
+                    weatherIcon = "partly-cloudy-night";
+                }
+                else if(weatherConditionDropdownValue.equals("Clear Day")) { weatherIcon = "clear-day"; }
+                else if(weatherConditionDropdownValue.equals("Clear Night")) { weatherIcon = "clear-night"; }
+                else if(weatherConditionDropdownValue.equals("Cloudy")) { weatherIcon = "cloudy"; }
+                else if(weatherConditionDropdownValue.equals("Rain")) { weatherIcon = "rain"; }
+                else if(weatherConditionDropdownValue.equals("Sleet")) { weatherIcon = "sleet"; }
+                else if(weatherConditionDropdownValue.equals("Snow")) { weatherIcon = "snow"; }
+                else if(weatherConditionDropdownValue.equals("Wind")) { weatherIcon = "wind"; }
+                else if(weatherConditionDropdownValue.equals("Fog")) { weatherIcon = "fog"; }
 
 
                 int index = weatherConditionDropdown.getSelectedItemPosition();
 
                 if(index > 0) {
                     weatherConditionDropdownText.setText("");
+                    weatherConditionDropdownText.setBackgroundColor(Color.WHITE);
+
                 }
                 else {
-                    weatherConditionDropdownText.setText("Select a weather condition");
-                    weatherConditionDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
+                    if(isOutdoor) {
+                        weatherConditionDropdownText.setText("Select a weather condition");
+                        weatherConditionDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
+                    }
+                    else {
+                        weatherConditionDropdownValue = "Indoors";
+                    }
                 }
             }
             @Override

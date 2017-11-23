@@ -2,6 +2,7 @@ package familyconnect.familyconnect;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.AuthFailureError;
@@ -30,10 +33,15 @@ public class UserSignupActivity extends AppCompatActivity {
     private EditText emailText;
     private EditText passwordText;
     private EditText confirm_passwordText;
+    private EditText groupNameText, groupIDText;
     private Button signupButton;
+    private Switch groupSwitch;
     private TextView loginLink;
     private RequestQueue queue;
-    private static boolean POST = false;
+    private boolean POST, GROUP_POST = false;
+    private boolean isCreateGroup = true;
+    private static int ID;
+    private static String EMAIL, TOKEN;
 
 
     @Override
@@ -47,8 +55,13 @@ public class UserSignupActivity extends AppCompatActivity {
         emailText = (EditText) findViewById(R.id.input_email);
         passwordText = (EditText) findViewById(R.id.input_password);
         confirm_passwordText = (EditText) findViewById(R.id.input_confirm_password);
+        groupSwitch = (Switch) findViewById(R.id.group_switch);
+        groupNameText = (EditText) findViewById(R.id.input_group_name);
+        groupIDText = (EditText) findViewById(R.id.input_group_ID);
         signupButton = (Button) findViewById(R.id.btn_signup);
         loginLink = (TextView) findViewById(R.id.link_login);
+
+        setGroupSwitch();
 
         queue = Volley.newRequestQueue(this);
 
@@ -69,6 +82,35 @@ public class UserSignupActivity extends AppCompatActivity {
         });
     }
 
+
+    public void setGroupSwitch() {
+
+        groupSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(isChecked) {
+                    groupSwitch.setText("Join Group");
+                    groupIDText.setVisibility(View.VISIBLE);
+                    groupIDText.requestFocus();
+                    groupIDText.setText("");
+
+                    groupNameText.setVisibility(View.GONE);
+                    isCreateGroup = false;
+                }
+                else {
+                    groupSwitch.setText("Create Group");
+                    groupNameText.setVisibility(View.VISIBLE);
+                    groupNameText.requestFocus();
+                    groupNameText.setText("");
+
+                    groupIDText.setVisibility(View.GONE);
+                    isCreateGroup = true;
+                }
+            }
+        });
+    }
+
+
     public void signup() {
 
         if (!validate()) {
@@ -84,14 +126,26 @@ public class UserSignupActivity extends AppCompatActivity {
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
 
+        UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
+        String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users";
+        taskPost.execute(uriPost);
+        POST = true;
+        GROUP_POST = false;
+
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
 
-                        UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
-                        String uriPost ="https://family-connect-ggc-2017.herokuapp.com/users";
-                        taskPost.execute(uriPost);
-                        POST = true;
+                        if(isCreateGroup) {
+                            UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
+                            String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/groups";
+                            taskPost.execute(uriPost);
+                            POST = false;
+                            GROUP_POST = true;
+                        }
+                        else {
+                            //Do Nothing
+                        }
 
                         progressDialog.dismiss();
                     }
@@ -106,7 +160,7 @@ public class UserSignupActivity extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Sign up failed", Toast.LENGTH_LONG).show();
 
         signupButton.setEnabled(true);
     }
@@ -118,6 +172,8 @@ public class UserSignupActivity extends AppCompatActivity {
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
         String confirm_password = confirm_passwordText.getText().toString();
+        String group_name = groupNameText.getText().toString();
+        String group_ID = groupIDText.getText().toString();
 
 
         if (name.isEmpty() || name.length() < 3) {
@@ -148,6 +204,24 @@ public class UserSignupActivity extends AppCompatActivity {
             confirm_passwordText.setError(null);
         }
 
+        if(isCreateGroup) {
+            if (group_name.isEmpty() || group_name.length() < 3) {
+                groupNameText.setError("Group name must be at least 3 characters");
+                valid = false;
+            } else {
+                groupNameText.setError(null);
+            }
+        }
+
+        if(!isCreateGroup) {
+            if (group_ID.isEmpty()) {
+                groupIDText.setError("Please enter a Group ID #");
+                valid = false;
+            } else {
+                groupIDText.setError(null);
+            }
+        }
+
         return valid;
     }
 
@@ -162,22 +236,6 @@ public class UserSignupActivity extends AppCompatActivity {
             //POST REQUEST
             if (POST) {
 
-                //PASS IN HEADER
-                 /*   @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        //headers.put("Content-Type", "application/json; charset=UTF-8");
-                        // headers.put("X-Email", emailText.getText().toString());
-                        // headers.put("X-Password", passwordText.getText().toString());
-                        // headers.put("X-User-Token", "TOKEN");
-
-                        return headers;
-                    }*/
-
-                //                                                                  (KEY,       VALUE)
-                //GET X-Token - Do a POST on (/sessions) it then returns a user token (X-Email, Jawan@gmail.com) (X-User-Token, 8U8774H7hGG)
-                //HEADER GET POST PUT DELETE Include (X-User-Email, X-User-Token, Content-Type = application/json)
-
                 //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
                 //@OnStart for creating a new session (do POST to (/SESSION))
                 //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
@@ -187,14 +245,20 @@ public class UserSignupActivity extends AppCompatActivity {
                         {
                             @Override
                             public void onResponse(String response) {
-                                Log.d("POST", response);
+                                String jsonRequest [ ] = response.split(",");
+
+                                ID = Integer.parseInt(jsonRequest[0].substring(6, jsonRequest[0].toString().length()));
+                                EMAIL = jsonRequest[4].substring(9, jsonRequest[4].toString().length()-1);
+                                TOKEN = jsonRequest[5].substring(24, jsonRequest[5].toString().length()-1);
+
+                                Log.d("POST REQUEST", response);
                             }
                         },
                         new Response.ErrorListener()
                         {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                // error
+                                onSignupFailed();
                                 Log.d("Error.Response", ""+error);
                             }
                         }
@@ -209,9 +273,55 @@ public class UserSignupActivity extends AppCompatActivity {
                         params.put("password", passwordText.getText().toString());
                         params.put("password_confirmation", confirm_passwordText.getText().toString());
 
+                        if(!isCreateGroup) {
+                            params.put("group_id", groupIDText.getText().toString());
+                        }
+
                         return params;
                     }
 
+                };
+                queue.add(postRequest);
+            }
+
+            if (GROUP_POST) {
+
+                StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
+                        new Response.Listener<String>()
+                        {
+                            @Override
+                            public void onResponse(String response) {
+
+                                Log.d("GROUP POST REQUEST", response);
+                            }
+                        },
+                        new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                Log.d("Error.Response", "" + error);
+                            }
+                        }
+                ) {
+
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("X-User-Email", emailText.getText().toString());
+                        headers.put("X-User-Token", TOKEN);
+
+                        return headers;
+                    }
+
+                    //PASS PARAMETERS
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String>  params = new HashMap<String, String>();
+                        params.put("group_name", groupNameText.getText().toString());
+
+                        return params;
+                    }
                 };
                 queue.add(postRequest);
             }

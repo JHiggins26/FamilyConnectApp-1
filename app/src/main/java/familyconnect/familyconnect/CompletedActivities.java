@@ -44,7 +44,7 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 public class CompletedActivities extends AppCompatActivity {
 
     private static ListView scrollView;
-    private TextView completedText;
+    private TextView groupsTitle, completedText;
     private List<String> completedActivityNames;
     private List<Activity> completedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
@@ -59,6 +59,10 @@ public class CompletedActivities extends AppCompatActivity {
         setContentView(R.layout.activity_completed_activities);
 
         scrollView = (ListView) findViewById(R.id.activityScroll);
+
+        groupsTitle = (TextView) findViewById(R.id.groupsTitle);
+        groupsTitle.setText(HomeTab.getGroupName() + " Group");
+
         completedText = (TextView) findViewById(R.id.no_completed_activity);
 
         completedActivityList = new ArrayList<Activity>();
@@ -71,6 +75,8 @@ public class CompletedActivities extends AppCompatActivity {
         completedActivityNames.clear();
         completedActivityList.clear();
 
+        int countCompleted = 0;
+
         for(int i = 0; i < DisplayActivitiesTab.getActivityList().size(); i++) {
 
             if(DisplayActivitiesTab.activityList.get(i).getCompleted() == true) {
@@ -80,15 +86,21 @@ public class CompletedActivities extends AppCompatActivity {
                 Activity activity = new Activity(DisplayActivitiesTab.activityList.get(i).getId(), DisplayActivitiesTab.activityList.get(i).getName(),
                         DisplayActivitiesTab.activityList.get(i).getWeatherIcon(), DisplayActivitiesTab.activityList.get(i).getWeatherSummary(),
                         DisplayActivitiesTab.activityList.get(i).getTempLow(), DisplayActivitiesTab.activityList.get(i).getTempHigh(),
-                        DisplayActivitiesTab.activityList.get(i).getCategory(),"N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
+                        DisplayActivitiesTab.activityList.get(i).getCategory(),HomeTab.getGroupName(), DisplayActivitiesTab.activityList.get(i).getCompleted());
 
                 completedActivityList.add(activity);
 
                 completedText.setText("");
 
+                countCompleted++;
             }
             else {
-                completedText.setText("No Completed Activities");
+                if(countCompleted > 0) {
+                    //Do Nothing
+                }
+                else {
+                    completedText.setText("No Completed Activities");
+                }
             }
         }
 

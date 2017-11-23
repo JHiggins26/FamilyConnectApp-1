@@ -28,10 +28,6 @@
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Welcome"
-            android:label="Family Connect"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".ActivityDetails"
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -49,7 +45,8 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".SuggestedDailyActivity"></activity>
+        <activity android:name=".SuggestedDailyActivity" />
+        <activity android:name=".SuggestedFutureActivity"></activity>
     </application>
 
 </manifest>

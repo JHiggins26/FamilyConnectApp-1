@@ -38,6 +38,19 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/weather_status"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toStartOf="@+id/settings_icon"
+            app:layout_constraintStart_toEndOf="@+id/degrees"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/welcomeTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -80,6 +93,7 @@
             android:id="@+id/settings_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginTop="6dp"
             android:background="@drawable/settings_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -194,22 +208,24 @@
 
         <ImageButton
             android:id="@+id/suggest_daily_activity_icon"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/suggest_activity_icon2"
             android:background="@drawable/suggest_activity_icon2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toBottomOf="@+id/calendarBGimage" />
 
         <TextView
-            android:id="@+id/daily_text"
+            android:id="@+id/daily_btn_text"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:text="Daily Activity"
@@ -222,36 +238,39 @@
             app:layout_constraintStart_toStartOf="@+id/suggest_daily_activity_icon"
             app:layout_constraintTop_toTopOf="@+id/suggest_daily_activity_icon" />
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/suggest_future_activity_icon"-->
-            <!--android:layout_width="140dp"-->
-            <!--android:layout_height="140dp"-->
-            <!--android:layout_marginBottom="8dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:layout_marginTop="8dp"-->
-            <!--android:background="@drawable/suggest_activity_icon"-->
-            <!--app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintHorizontal_bias="1.0"-->
-            <!--app:layout_constraintLeft_toLeftOf="parent"-->
-            <!--app:layout_constraintRight_toRightOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/listBGimage"-->
-            <!--app:layout_constraintVertical_bias="1.0" />-->
+        <ImageButton
+            android:id="@+id/suggest_future_activity_icon"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/suggest_activity_icon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/calendarBGimage" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/future_text"-->
-            <!--android:layout_width="140dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="Future Activity"-->
-            <!--android:textAlignment="center"-->
-            <!--android:textColor="#ffffff"-->
-            <!--android:textSize="30dp"-->
-            <!--android:textStyle="italic"-->
-            <!--app:layout_constraintBottom_toBottomOf="@+id/suggest_future_activity_icon"-->
-            <!--app:layout_constraintEnd_toEndOf="@+id/suggest_future_activity_icon"-->
-            <!--app:layout_constraintStart_toStartOf="@+id/suggest_future_activity_icon"-->
-            <!--app:layout_constraintTop_toTopOf="@+id/suggest_future_activity_icon" />-->
+        <TextView
+            android:id="@+id/future_btn_text"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:text="Future Activity"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="30dp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintEnd_toEndOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintStart_toStartOf="@+id/suggest_daily_activity_icon"
+            app:layout_constraintTop_toTopOf="@+id/suggest_daily_activity_icon" />
+
 
 
     </android.support.constraint.ConstraintLayout>

@@ -55,7 +55,7 @@ public class UserLoginActivity extends AppCompatActivity {
     private boolean GET, POST = false;
     private static int ID;
     private static String TOKEN;
-    private static String username;
+    private static String username, groupID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,7 +124,7 @@ public class UserLoginActivity extends AppCompatActivity {
 
                         progressDialog.dismiss();
                     }
-                }, 3500);
+                }, 4000);
     }
 
 
@@ -264,6 +264,7 @@ public class UserLoginActivity extends AppCompatActivity {
 
                                 try {
                                     username = response.getString("user_name");
+                                    groupID = response.getString("group_id");
 
                                     Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
                                     UserLoginActivity.this.startActivity(homePage);
@@ -288,7 +289,7 @@ public class UserLoginActivity extends AppCompatActivity {
                     public Map<String, String> getHeaders() {
                         Map<String, String> headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/json");
-                        headers.put("X-User-Email", emailText.getText().toString());
+                        headers.put("X-User-Email", emailText.getText().toString().toLowerCase());
                         headers.put("X-User-Token", TOKEN);
 
                         return headers;
@@ -321,5 +322,10 @@ public class UserLoginActivity extends AppCompatActivity {
     public static String getUsername() {
         return username;
     }
+
+    public static String getGroupID() {
+        return groupID;
+    }
+
 
 }

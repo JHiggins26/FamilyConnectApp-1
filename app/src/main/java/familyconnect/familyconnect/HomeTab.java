@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -51,6 +53,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 
@@ -61,7 +65,8 @@ import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 public class HomeTab extends Fragment implements View.OnClickListener {
 
-    private TextView username, degrees;
+    private TextView username;
+    private static TextView degrees, weatherStatus;
     private ImageButton settings;
     private PopupWindow settingsWindow;
     private LayoutInflater layoutInflater;
@@ -77,14 +82,20 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     private Animation animRotate, animScale;
     private AnimationSet setAnim;
     private ImageButton dailyBtn;
+    private TextView dailyBtnText;
+    private static ImageButton futureBtn;
+    private TextView futureBtnText;
 
-    private MediaPlayer dailyActivitySound;
+    private static MediaPlayer dailyActivitySound;
 
-    private boolean isWeather = false;
-    private RequestQueue queue;
-    private double longitude, latitude;
+    private static boolean isWeather, isFutureWeather, isGroupName = false;
+    private static RequestQueue queue;
+    private static double longitude;
+    private static double latitude;
     private GPSLocation gps;
-    private static String temperature = " ", summary, icon;
+    private static String temperature, summary, futureSummary, icon, futureIcon = " ";
+    private static Double futureTemperatureHigh, futureTemperatureLow = 0.0;
+    private static String groupName;
     private static boolean RUN_ONCE = true;
 
 
@@ -97,6 +108,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         queue = Volley.newRequestQueue(getActivity());
 
         degrees = rootView.findViewById(R.id.degrees);
+        weatherStatus = rootView.findViewById(R.id.weather_status);
 
         settings = rootView.findViewById(R.id.settings_icon);
         settings.setOnClickListener(this);
@@ -127,6 +139,11 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         dailyBtn = rootView.findViewById(R.id.suggest_daily_activity_icon);
         dailyBtn.setOnClickListener(this);
+        dailyBtnText = rootView.findViewById(R.id.daily_btn_text);
+
+        futureBtn = rootView.findViewById(R.id.suggest_future_activity_icon);
+        futureBtn.setOnClickListener(this);
+        futureBtnText = rootView.findViewById(R.id.future_btn_text);
 
         //Animations
         animRotate = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_rotate);
@@ -138,6 +155,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         dailyActivitySound = MediaPlayer.create(getActivity(), R.raw.daily_activity_sound);
 
+        requestGroupName();
         getGPSLocation();
         getWeather();
 
@@ -236,19 +254,19 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                 break;
 
             case (R.id.calendarBGimage):
-
+                showDatePickerDialog(v);
                 break;
 
             case R.id.calendar_arrow:
-
+                showDatePickerDialog(v);
                 break;
 
             case R.id.calendar_icon:
-
+                showDatePickerDialog(v);
                 break;
 
             case R.id.calendar_text:
-
+                showDatePickerDialog(v);
                 break;
 
             case R.id.suggest_daily_activity_icon:
@@ -256,29 +274,94 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                 v.startAnimation(setAnim);
                 dailyActivitySound.start();
 
+                dailyActivitySound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+
+                    };
+                });
+
                 new android.os.Handler().postDelayed(
                         new Runnable() {
                             public void run() {
-
                                 Intent suggestedActivityPage = new Intent(getActivity(), SuggestedDailyActivity.class);
                                 HomeTab.this.startActivity(suggestedActivityPage);
                             }
                         }, 1200);
                 break;
 
+            case R.id.suggest_future_activity_icon:
+                getFutureWeather();
+                break;
         }
+    }
+
+
+    public void requestGroupName() {
+
+        isGroupName = true;
+        isWeather = false;
+        isFutureWeather = false;
+
+        HomeTab.FamilyConnectFetchTask taskGet = new HomeTab.FamilyConnectFetchTask();
+        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID();
+        taskGet.execute(uriGet);
     }
 
 
     public void getWeather() {
 
         isWeather = true;
+        isFutureWeather = false;
+        isGroupName = false;
 
         HomeTab.FamilyConnectFetchTask taskPost = new HomeTab.FamilyConnectFetchTask();
         //URI REQUEST: DOMAIN   /KEY   /LAT,LON
         String uriGetForecast = "https://api.darksky.net/forecast/879da94f7c402798f1bf303383070b27/" + latitude + "," + longitude;
 
         taskPost.execute(uriGetForecast);
+    }
+
+
+    public void getFutureWeather() {
+
+        isFutureWeather = true;
+        isWeather = false;
+        isGroupName = false;
+
+        HomeTab.FamilyConnectFetchTask taskPost = new HomeTab.FamilyConnectFetchTask();
+        //URI REQUEST: DOMAIN   /KEY   /LAT,LON   ,YYYY-MM-DD   T   HH:MM:SS
+        String uriGet = "https://api.darksky.net/forecast/879da94f7c402798f1bf303383070b27/" + latitude + "," + longitude + "," +
+                DatePickerFragment.getSpecialDateFormat() + "T" + TimePickerFragment.getSpecialFormatTime();
+
+        taskPost.execute(uriGet);
+
+        dailyBtn.setVisibility(View.GONE);
+        dailyBtnText.setVisibility(View.GONE);
+        futureBtn.setVisibility(View.VISIBLE);
+        futureBtnText.setVisibility(View.VISIBLE);
+
+        futureBtn.startAnimation(setAnim);
+        dailyActivitySound.start();
+
+        dailyActivitySound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+            };
+        });
+
+        try {
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            Intent futureSuggestedPage = new Intent(getActivity(), SuggestedFutureActivity.class);
+                            HomeTab.this.startActivity(futureSuggestedPage);
+                        }
+                    }, 1500);
+        }catch (Exception npe) {
+            Intent homePage = new Intent(getActivity(), HomeTab.class);
+            HomeTab.this.startActivity(homePage);
+        }
     }
 
 
@@ -318,6 +401,11 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         }
     }
 
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
+
 
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
@@ -325,6 +413,45 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         protected Bitmap doInBackground(String... params) {
 
             Log.v("FamilyConnect", "URL = " + params[0]);
+
+            //GET REQUEST FOR GROUP NAME
+            if (isGroupName) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                                try {
+                                    Log.v("Response", response.getString("group_name"));
+                                    groupName = response.getString("group_name");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                ) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        headers.put("X-User-Email", UserLoginActivity.getEmail());
+                        headers.put("X-User-Token", UserLoginActivity.getToken());
+
+                        return headers;
+                    }
+                };
+                queue.add(getRequest);
+            }
 
             //GET REQUEST FOR WEATHER
             if (isWeather) {
@@ -354,8 +481,65 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                                     temperature = tempObj.getString("temperature");
 
                                     degrees.setText(((int)Double.parseDouble(temperature)) + " °F");
+                                    weatherStatus.setText(icon.replace("-", " "));
 
                                     Log.v("Summary", summary + ", ICON " + icon);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.d("Error.Response", error.toString());
+                            }
+                        }
+                );
+                queue.add(getRequest);
+            }
+
+
+            //GET REQUEST FOR FUTURE WEATHER
+            if (isFutureWeather) {
+
+                final JSONObject jsonObject = new JSONObject();
+
+                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
+                        new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                                try {
+//                                    JSONObject hourly = response.getJSONObject("hourly");
+//
+//                                    futureTemperature = String.valueOf(hourly.getInt("temperature"));
+//                                    futureSummary = hourly.getString("summary");
+//                                    futureIcon = hourly.getString("icon");
+
+                                    JSONObject hourly = response.getJSONObject("daily");
+                                    //futureSummary = hourly.getString("summary");
+                                    //futureIcon = hourly.getString("icon");
+
+                                    JSONArray data = hourly.getJSONArray("data");
+
+                                    JSONObject summaryObj = data.getJSONObject(0);
+                                    futureSummary = summaryObj.getString("summary");
+
+                                    JSONObject iconObj = data.getJSONObject(0);
+                                    futureIcon = iconObj.getString("icon");
+
+                                    JSONObject tempHighObj = data.getJSONObject(0);
+                                    futureTemperatureHigh = tempHighObj.getDouble("temperatureHigh");
+
+                                    JSONObject tempLowObj = data.getJSONObject(0);
+                                    futureTemperatureLow = tempLowObj.getDouble("temperatureLow");
+
+                                    Log.v("Summary", "The temperature at " + TimePickerFragment.getTime() + " is High:" + futureTemperatureHigh + " °F"
+                                            + " Low: " + futureTemperatureLow + ", Summary: " + futureSummary + ", Icon " + futureIcon);
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -389,12 +573,28 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         return temperature;
     }
 
+    public static Double getFutureTemperatureHigh() {
+        return futureTemperatureHigh;
+    }
+
+    public static Double getFutureTemperatureLow() {
+        return futureTemperatureLow;
+    }
+
     public static String getIcon() {
         return icon;
     }
 
+    public static String getFutureIcon() {
+        return futureIcon;
+    }
+
     public static String getSummary() {
         return summary;
+    }
+
+    public static String getFutureSummary() {
+        return futureSummary;
     }
 
     public static boolean getRunOnce() {
@@ -404,4 +604,8 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     public static void setRunOnce(boolean RUN_ONCE) {
         HomeTab.RUN_ONCE = RUN_ONCE;
     }
+
+    public static String getGroupName() { return groupName; }
+
+    public static ImageButton getFutureBtn() { return futureBtn; }
 }

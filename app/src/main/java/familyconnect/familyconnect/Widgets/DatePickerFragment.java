@@ -18,7 +18,7 @@ import familyconnect.familyconnect.R;
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     private static Date dateRepresentation;
-    private static String specialDateFormat;
+    private static String specialDateFormat, uniformDateFormat;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -33,8 +33,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
-        EditText textField= (EditText) getActivity().findViewById(R.id.activityDate);
+
+        uniformDateFormat = (month+1) + "-" + day + "-" + year;
 
         //[YYYY]-[MM]-[DD]
 
@@ -64,10 +64,10 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
             }
         }
 
-        textField.setText("Date: " + (month+1) + "/" + day + "/" + year);
         Log.v("DATE", ""+specialDateFormat);
 
-        CreateActivitiesTab.getWeatherButton().performClick();
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(),"TimePicker");
 
     }
 
@@ -79,4 +79,9 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     public static void setSpecialDateFormat(String  specialDateFormat) {
         DatePickerFragment.specialDateFormat = specialDateFormat;
     }
+
+    public static String getUniformDateFormat() {
+        return uniformDateFormat;
+    }
+
 }

@@ -47,7 +47,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private static ListView scrollView;
-    private TextView loadingText;
+    private TextView groupsTitle, loadingText;
     private RequestQueue queue;
     private boolean GET = false;
     protected List<String> jsonArray;
@@ -73,6 +73,10 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(this);
 
         scrollView = rootView.findViewById(R.id.activityScroll);
+
+        groupsTitle = rootView.findViewById(R.id.groupsTitle);
+        groupsTitle.setText(HomeTab.getGroupName() + " Group Activities");
+
         loadingText = rootView.findViewById(R.id.loading);
 
         completedActivitiesBtn = rootView.findViewById(R.id.completedActivities);
@@ -111,7 +115,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         GET = true;
 
         DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
         taskGet.execute(uriGet);
     }
 
@@ -122,6 +126,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         if (isVisibleToUser) {
 
             loadingText.setText("Loading Activities...");
+            groupsTitle.setText(HomeTab.getGroupName() + " Group Activities");
 
             //Clear JSON and Activity array to Sync the list
             jsonArray.clear();
@@ -130,7 +135,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             GET = true;
 
             DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
             taskGet.execute(uriGet);
 
             if(CreateActivitiesTab.getIsCreated()) {
@@ -217,7 +222,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(),activities.getIcon(), activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getIsCompleted());
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), HomeTab.getGroupName(), activities.getIsCompleted());
 
                         activityList.add(0, activity);
 

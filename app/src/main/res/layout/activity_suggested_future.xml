@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context="familyconnect.familyconnect.SuggestedDailyActivity">
+    tools:context="familyconnect.familyconnect.SuggestedFutureActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,13 +17,30 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Daily Activity"
+            android:text="Future Activity"
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="30dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="40dp"
+            android:background="#FFF1B4"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="Date:"
+            android:textColor="#000000"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/daily_activity" />
 
         <TextView
             android:id="@+id/weather_temp"
@@ -39,6 +56,9 @@
             android:textColor="#000000"
             android:textSize="20dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weather_summary" />
 
@@ -63,7 +83,9 @@
             android:id="@+id/weather_summary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
             android:background="#FFF1B4"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
@@ -75,7 +97,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/daily_activity" />
+            app:layout_constraintTop_toBottomOf="@+id/date_text" />
 
         <TextView
             android:id="@+id/activity_header_title"
