@@ -222,10 +222,6 @@ public class UserLoginActivity extends AppCompatActivity {
             //POST REQUEST
             if (POST) {
 
-                //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
-                //@OnStart for creating a new session (do POST to (/SESSION))
-                //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
-
                 StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
                         new Response.Listener<String>()
                         {
