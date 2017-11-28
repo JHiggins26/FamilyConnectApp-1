@@ -1,30 +1,25 @@
 package familyconnect.familyconnect;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedInputStream;
@@ -37,18 +32,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import familyconnect.familyconnect.Widgets.DatePickerFragment;
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
-
+/**
+ * DisplayActivitiesTab.java - a class that displays all the activities that are created and not completed.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private static ListView scrollView;
+    private ListView scrollView;
     private TextView groupsTitle, loadingText;
-    private RequestQueue queue;
+    private TextView completedActivitiesBtn;
+    private ImageView starBtn;
     private boolean GET = false;
     protected List<String> jsonArray;
     public static List<Activity> activityList, nonCompletedActivityList;
@@ -56,40 +55,38 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
     private static boolean activityComplete;
     private static long activityId;
-    private TextView completedActivitiesBtn;
-    private ImageView starBtn;
 
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.displayactivitiestab, container, false);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-
         swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
-
         scrollView = rootView.findViewById(R.id.activityScroll);
-
         groupsTitle = rootView.findViewById(R.id.groupsTitle);
-        groupsTitle.setText(HomeTab.getGroupName() + " Group Activities");
-
         loadingText = rootView.findViewById(R.id.loading);
-
         completedActivitiesBtn = rootView.findViewById(R.id.completedActivities);
-        completedActivitiesBtn.setOnClickListener(this);
-
         starBtn = rootView.findViewById(R.id.star_icon);
-        starBtn.setOnClickListener(this);
 
         jsonArray = new ArrayList<String>();
         activityList = new ArrayList<Activity>();
         nonCompletedActivityList = new ArrayList<Activity>();
 
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        completedActivitiesBtn.setOnClickListener(this);
+        starBtn.setOnClickListener(this);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+
+        FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +99,11 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         return rootView;
     }
 
-
+    /**
+     * @method onRefresh()
+     *
+     * This method refreshes the activity display list to update the list.
+     */
     @Override
     public void onRefresh() {
 
@@ -111,60 +112,88 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
         //Clear JSON and Activity array to Sync the list
         jsonArray.clear();
         activityList.clear();
+        nonCompletedActivityList.clear();
 
         GET = true;
 
-        DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
-        taskGet.execute(uriGet);
+        if(GroupsTab.getGroupID() == 0) {
+            loadingText.setText("No Activities");
+            groupsTitle.setText("Group Activities");
+            swipeRefreshLayout.setRefreshing(false);
+
+            Toast.makeText(getActivity(), "Please consider joining or creating a group first!",
+                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
+            String uriGet = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
+            taskGet.execute(uriGet);
+        }
+
     }
 
-
+    /**
+     * @method setUserVisibleHint()
+     *
+     * This method notifies the DOM when the Display Tab is shown.
+     *
+     * @param isVisibleToUser
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
 
-            loadingText.setText("Loading Activities...");
-            groupsTitle.setText(HomeTab.getGroupName() + " Group Activities");
-
             //Clear JSON and Activity array to Sync the list
             jsonArray.clear();
             activityList.clear();
+            nonCompletedActivityList.clear();
 
-            GET = true;
+            loadingText.setText("Loading Activities...");
 
-            DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
-            String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
-            taskGet.execute(uriGet);
+            if(GroupsTab.getGroupID() == 0) {
+                loadingText.setText("No Activities");
+                groupsTitle.setText("Group Activities");
+                scrollView.requestLayout();
 
-            if(CreateActivitiesTab.getIsCreated()) {
-
-                CreateActivitiesTab.getName().setText("");
-                CreateActivitiesTab.getDate().setText("");
-                CreateActivitiesTab.getTime().setText("");
-                CreateActivitiesTab.getWeather().setText("");
-                CreateActivitiesTab.getCategory().setText("");
-                CreateActivitiesTab.getGroup().setText("");
-
-                DatePickerFragment.setSpecialDateFormat("");
-                TimePickerFragment.setSpecialFormatTime("");
-
-                CreateActivitiesTab.setCreated(false);
+                Toast.makeText(getActivity(), "Please consider joining or creating a group first!",
+                        Toast.LENGTH_LONG).show();
             }
+            else {
+                GET = true;
+
+                groupsTitle.setText(GroupsTab.getGroupsDropdownValue() + " Group Activities");
+
+                DisplayActivitiesTab.FamilyConnectFetchTask taskGet = new DisplayActivitiesTab.FamilyConnectFetchTask();
+                String uriGet = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
+                taskGet.execute(uriGet);
+            }
+
         }
         else {
             //Do Nothing
         }
     }
 
+    /**
+     * @method onClick()
+     *
+     * This method listens for buttons that are clicked.
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         Intent completedActivityPage = new Intent(getActivity(), CompletedActivities.class);
         DisplayActivitiesTab.this.startActivity(completedActivityPage);
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         //Converts JSON string into a Activity object
@@ -178,11 +207,10 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             return activity;
         }
 
-
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //GET REQUEST
             if (GET) {
@@ -221,8 +249,16 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
 
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
-                        Activity activity = new Activity(activities.getId(), activities.getActivitieName(),activities.getIcon(), activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), HomeTab.getGroupName(), activities.getIsCompleted());
+                        Activity activity;
+
+                        if(GroupsTab.getGroupID() == 0) {
+                            activity = new Activity(activities.getId(), activities.getActivitieName(), activities.getIcon(), activities.getCondition(),
+                                    activities.getTempLow(), activities.getTempHi(), activities.getCategory(), "N/A", activities.getIsCompleted());
+                        }
+                        else {
+                            activity = new Activity(activities.getId(), activities.getActivitieName(), activities.getIcon(), activities.getCondition(),
+                                    activities.getTempLow(), activities.getTempHi(), activities.getCategory(), GroupsTab.getGroupsDropdownValue(), activities.getIsCompleted());
+                        }
 
                         activityList.add(0, activity);
 
@@ -239,7 +275,6 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     e.printStackTrace();
                 }
             }
-
                 return null;
             }
 
@@ -248,7 +283,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             protected void onPostExecute (Bitmap bitmap){
                 super.onPostExecute(bitmap);
 
-                // stopping swipe refresh
+                // Stopping swipe refresh
                 swipeRefreshLayout.setRefreshing(false);
 
                 //Deletes the Loading Text when Activities appear
@@ -257,7 +292,6 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                 if(nonCompletedActivityList.size() == 0) {
                     loadingText.setText("No Activities");
                 }
-
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
                             R.layout.displayactivitylist, R.id.listText, jsonArray);
@@ -269,7 +303,6 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         int itemPosition = position;
-                        String  itemValue = (String) scrollView.getItemAtPosition(position);
 
                         activityId = nonCompletedActivityList.get(itemPosition).getId();
                         activityDetailsTitle = nonCompletedActivityList.get(itemPosition).getName();
@@ -311,5 +344,7 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     public static String getActivityGroup() { return activityGroup; }
     public static boolean getActivityComplete() { return activityComplete; }
     public static List getActivityList() { return activityList; }
-
+    public static List getNonCompletedActivityList() {
+        return nonCompletedActivityList;
+    }
 }

@@ -9,12 +9,9 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -36,6 +32,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -56,13 +53,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Timer;
 
 import familyconnect.familyconnect.Widgets.DatePickerFragment;
 import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 
+/**
+ * HomeTab.java - a class that displays the users .
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class HomeTab extends Fragment implements View.OnClickListener {
 
     private TextView username;
@@ -88,19 +91,24 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
     private static MediaPlayer dailyActivitySound;
 
-    private static boolean isWeather, isFutureWeather, isGroupName = false;
+    private static boolean isWeather, isFutureWeather = false;
     private static RequestQueue queue;
     private static double longitude;
     private static double latitude;
     private GPSLocation gps;
     private static String temperature, summary, futureSummary, icon, futureIcon = " ";
-    private static Double futureTemperatureHigh, futureTemperatureLow = 0.0;
-    private static String groupName;
+    private static double futureTemperature, futureTemperatureHigh, futureTemperatureLow = 0.0;
     private static boolean RUN_ONCE = true;
 
 
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.hometab, container, false);
@@ -155,7 +163,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         dailyActivitySound = MediaPlayer.create(getActivity(), R.raw.daily_activity_sound);
 
-        requestGroupName();
+
         getGPSLocation();
         getWeather();
 
@@ -211,6 +219,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         RUN_ONCE = true;
+                                        GroupsTab.setGroupID(0);
                                         Intent loginPage = new Intent(getActivity(), UserLoginActivity.class);
                                         HomeTab.this.startActivity(loginPage);
                                     }
@@ -271,41 +280,44 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
             case R.id.suggest_daily_activity_icon:
 
-                v.startAnimation(setAnim);
-                dailyActivitySound.start();
+                if(GroupsTab.getGroupID() == 0) {
+                    Toast.makeText(getActivity(), "Please consider joining or creating a group first!",
+                            Toast.LENGTH_LONG).show();
+                }
+                else {
+                    v.startAnimation(setAnim);
+                    dailyActivitySound.start();
 
-                dailyActivitySound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.release();
+                    dailyActivitySound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        public void onCompletion(MediaPlayer mp) {
+                            mp.release();
 
-                    };
-                });
+                        }
 
-                new android.os.Handler().postDelayed(
-                        new Runnable() {
-                            public void run() {
-                                Intent suggestedActivityPage = new Intent(getActivity(), SuggestedDailyActivity.class);
-                                HomeTab.this.startActivity(suggestedActivityPage);
-                            }
-                        }, 1200);
+                        ;
+                    });
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    Intent suggestedActivityPage = new Intent(getActivity(), SuggestedDailyActivity.class);
+                                    HomeTab.this.startActivity(suggestedActivityPage);
+                                }
+                            }, 1200);
+                }
                 break;
 
             case R.id.suggest_future_activity_icon:
-                getFutureWeather();
+
+                if(GroupsTab.getGroupID() == 0) {
+                    Toast.makeText(getActivity(), "Please consider joining or creating a group first!",
+                            Toast.LENGTH_LONG).show();
+                }
+                else {
+                    getFutureWeather();
+                }
                 break;
         }
-    }
-
-
-    public void requestGroupName() {
-
-        isGroupName = true;
-        isWeather = false;
-        isFutureWeather = false;
-
-        HomeTab.FamilyConnectFetchTask taskGet = new HomeTab.FamilyConnectFetchTask();
-        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID();
-        taskGet.execute(uriGet);
     }
 
 
@@ -313,7 +325,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         isWeather = true;
         isFutureWeather = false;
-        isGroupName = false;
 
         HomeTab.FamilyConnectFetchTask taskPost = new HomeTab.FamilyConnectFetchTask();
         //URI REQUEST: DOMAIN   /KEY   /LAT,LON
@@ -327,7 +338,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         isFutureWeather = true;
         isWeather = false;
-        isGroupName = false;
 
         HomeTab.FamilyConnectFetchTask taskPost = new HomeTab.FamilyConnectFetchTask();
         //URI REQUEST: DOMAIN   /KEY   /LAT,LON   ,YYYY-MM-DD   T   HH:MM:SS
@@ -349,19 +359,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                 mp.release();
             };
         });
-
-        try {
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            Intent futureSuggestedPage = new Intent(getActivity(), SuggestedFutureActivity.class);
-                            HomeTab.this.startActivity(futureSuggestedPage);
-                        }
-                    }, 1500);
-        }catch (Exception npe) {
-            Intent homePage = new Intent(getActivity(), HomeTab.class);
-            HomeTab.this.startActivity(homePage);
-        }
     }
 
 
@@ -406,52 +403,20 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
+
 
         @Override
         protected Bitmap doInBackground(String... params) {
 
             Log.v("FamilyConnect", "URL = " + params[0]);
 
-            //GET REQUEST FOR GROUP NAME
-            if (isGroupName) {
-
-                final JSONObject jsonObject = new JSONObject();
-
-                JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, params[0], jsonObject,
-                        new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                                try {
-                                    Log.v("Response", response.getString("group_name"));
-                                    groupName = response.getString("group_name");
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d("Error.Response", error.toString());
-                            }
-                        }
-                ) {
-                    @Override
-                    public Map<String, String> getHeaders() {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        headers.put("Content-Type", "application/json");
-                        headers.put("X-User-Email", UserLoginActivity.getEmail());
-                        headers.put("X-User-Token", UserLoginActivity.getToken());
-
-                        return headers;
-                    }
-                };
-                queue.add(getRequest);
-            }
 
             //GET REQUEST FOR WEATHER
             if (isWeather) {
@@ -481,7 +446,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                                     temperature = tempObj.getString("temperature");
 
                                     degrees.setText(((int)Double.parseDouble(temperature)) + " °F");
-                                    weatherStatus.setText(icon.replace("-", " "));
+                                    weatherStatus.setText(icon.replace("-", " ").toUpperCase());
 
                                     Log.v("Summary", summary + ", ICON " + icon);
 
@@ -493,6 +458,8 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getActivity(), "Please try the request again!",
+                                        Toast.LENGTH_SHORT).show();
                                 // error
                                 Log.d("Error.Response", error.toString());
                             }
@@ -511,35 +478,45 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                         new Response.Listener<JSONObject>() {
 
                             @Override
-                            public void onResponse(JSONObject response) {
+                            public void onResponse(final JSONObject response) {
 
                                 try {
-//                                    JSONObject hourly = response.getJSONObject("hourly");
-//
-//                                    futureTemperature = String.valueOf(hourly.getInt("temperature"));
+                                    JSONObject hourly = response.getJSONObject("hourly");
+
+                                    JSONArray dataHourly = hourly.getJSONArray("data");
+
+                                    JSONObject tempObj = dataHourly.getJSONObject(0);
+                                    futureTemperature = tempObj.getDouble("temperature");
+
 //                                    futureSummary = hourly.getString("summary");
 //                                    futureIcon = hourly.getString("icon");
 
-                                    JSONObject hourly = response.getJSONObject("daily");
+                                    JSONObject daily = response.getJSONObject("daily");
                                     //futureSummary = hourly.getString("summary");
                                     //futureIcon = hourly.getString("icon");
 
-                                    JSONArray data = hourly.getJSONArray("data");
+                                    JSONArray dataDaily = daily.getJSONArray("data");
 
-                                    JSONObject summaryObj = data.getJSONObject(0);
+                                    JSONObject summaryObj = dataDaily.getJSONObject(0);
                                     futureSummary = summaryObj.getString("summary");
 
-                                    JSONObject iconObj = data.getJSONObject(0);
+                                    JSONObject iconObj = dataDaily.getJSONObject(0);
                                     futureIcon = iconObj.getString("icon");
 
-                                    JSONObject tempHighObj = data.getJSONObject(0);
+                                    JSONObject tempHighObj = dataDaily.getJSONObject(0);
                                     futureTemperatureHigh = tempHighObj.getDouble("temperatureHigh");
 
-                                    JSONObject tempLowObj = data.getJSONObject(0);
+                                    JSONObject tempLowObj = dataDaily.getJSONObject(0);
                                     futureTemperatureLow = tempLowObj.getDouble("temperatureLow");
 
                                     Log.v("Summary", "The temperature at " + TimePickerFragment.getTime() + " is High:" + futureTemperatureHigh + " °F"
                                             + " Low: " + futureTemperatureLow + ", Summary: " + futureSummary + ", Icon " + futureIcon);
+
+                                    if((Double)futureTemperature != null && futureSummary != null && futureIcon != null
+                                            && (Double)futureTemperatureHigh != null && (Double)futureTemperatureLow != null) {
+                                        Intent futureSuggestedPage = new Intent(getActivity(), SuggestedFutureActivity.class);
+                                        HomeTab.this.startActivity(futureSuggestedPage);
+                                    }
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -549,6 +526,8 @@ public class HomeTab extends Fragment implements View.OnClickListener {
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getActivity(), "Please try the request again!",
+                                        Toast.LENGTH_SHORT).show();
                                 // error
                                 Log.d("Error.Response", error.toString());
                             }
@@ -571,6 +550,10 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
     public static String getTemperature() {
         return temperature;
+    }
+
+    public static Double getFutureTemperature() {
+        return futureTemperature;
     }
 
     public static Double getFutureTemperatureHigh() {
@@ -604,8 +587,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     public static void setRunOnce(boolean RUN_ONCE) {
         HomeTab.RUN_ONCE = RUN_ONCE;
     }
-
-    public static String getGroupName() { return groupName; }
 
     public static ImageButton getFutureBtn() { return futureBtn; }
 }

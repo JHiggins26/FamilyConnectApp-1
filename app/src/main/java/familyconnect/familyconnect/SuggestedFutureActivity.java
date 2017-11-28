@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,8 +27,16 @@ import java.util.Random;
 import java.util.Scanner;
 
 import familyconnect.familyconnect.Widgets.DatePickerFragment;
+import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class SuggestedFutureActivity extends AppCompatActivity implements View.OnClickListener{
 
     private boolean isActivity, isActivityFound = false;
@@ -43,7 +52,13 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
     private int nextActivity = 0;
     private boolean runOnce = false;
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,13 +104,24 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
 
         isActivity = true;
 
-        SuggestedFutureActivity.FamilyConnectFetchTask taskPost = new SuggestedFutureActivity.FamilyConnectFetchTask();
-        String uriGetActivity ="https://family-connect-ggc-2017.herokuapp.com/users";
+        if(GroupsTab.getGroupID() == 0) {
+            Toast.makeText(SuggestedFutureActivity.this, "Please consider joining or creating a group first!",
+                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            SuggestedFutureActivity.FamilyConnectFetchTask taskPost = new SuggestedFutureActivity.FamilyConnectFetchTask();
+            String uriGetActivity = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
 
-        taskPost.execute(uriGetActivity);
+            taskPost.execute(uriGetActivity);
+        }
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         //Converts JSON string into a Activity object
@@ -114,11 +140,11 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
         protected Bitmap doInBackground(String... params) {
 
             //GET REQUEST FOR ALL ACTIVITIES
-            if (isActivity && HomeTab.getTemperature() != null) {
+            if (isActivity && HomeTab.getFutureTemperature() != null) {
 
                 try {
                     String line;
-                    URL url = new URL(params[0] + "/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities");
+                    URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.addRequestProperty("Content-Type", "application/json");
@@ -151,20 +177,21 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(), activities.getIcon(), activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), HomeTab.getGroupName(), activities.getIsCompleted());
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), GroupsTab.getGroupsDropdownValue(), activities.getIsCompleted());
 
                         //Filter temperature
-                        if((HomeTab.getFutureTemperatureLow() >= Double.parseDouble(activities.getTempLow()) &&
-                                HomeTab.getFutureTemperatureHigh() <= Double.parseDouble(activities.getTempHi()))
+                        if((HomeTab.getFutureTemperature() >= Double.parseDouble(activities.getTempLow()) &&
+                                HomeTab.getFutureTemperature() <= Double.parseDouble(activities.getTempHi()))
                                 || (activities.getCondition().equals("Indoors"))) {
 
                             //Filter Weather Status
                             if(HomeTab.getFutureIcon().equals(activities.getIcon()) || activities.getIcon().equals("Indoors")) {
 
                                 //Filter If Activity Has Not Been Completed
-                                if(!activities.getIsCompleted())
+                                if(!activities.getIsCompleted()) {
                                     isActivityFound = true;
                                     suggestedList.add(activity.toString());
+                                }
                             }
                         }
                     }
@@ -207,12 +234,13 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
-            date.setText("Date: " + DatePickerFragment.getUniformDateFormat());
+            date.setText("Date: " + DatePickerFragment.getUniformDateFormat() + " @ " + TimePickerFragment.getTime());
 
             if(isActivityFound) {
-                weatherTemp.setText("Temperature: " + "High: " + ((int) Double.parseDouble(activityTempHigh)) + "°F " + "Low: " + ((int) Double.parseDouble(activityTempLow)) + "°F");
-                weatherCondition.setText("Weather Condition:" + activityCondition);
-                weatherSummary.setText("Weather Summary: " + HomeTab.getFutureSummary());
+                weatherSummary.setText("Weather Summary: " + HomeTab.getFutureSummary() + "\nHigh: " + HomeTab.getFutureTemperatureHigh() + "°F" +
+                        " Low: " + HomeTab.getFutureTemperatureLow() + "°F" + "\nCurrently: " + HomeTab.getFutureTemperature() + "°F");
+                weatherTemp.setText("Activity Temperature: " + "High: " + ((int) Double.parseDouble(activityTempHigh)) + "°F " + "Low: " + ((int) Double.parseDouble(activityTempLow)) + "°F");
+                weatherCondition.setText("Activity Weather Condition:" + activityCondition);
                 activityTitle.setText(activityName);
             }
             else {

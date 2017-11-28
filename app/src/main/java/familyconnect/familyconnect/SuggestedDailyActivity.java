@@ -52,6 +52,13 @@ import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class SuggestedDailyActivity extends AppCompatActivity implements View.OnClickListener{
 
     private boolean isActivity, isActivityFound = false;
@@ -67,7 +74,13 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     private int nextActivity = 0;
     private boolean runOnce = false;
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,13 +125,24 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
 
         isActivity = true;
 
-        SuggestedDailyActivity.FamilyConnectFetchTask taskPost = new SuggestedDailyActivity.FamilyConnectFetchTask();
-        String uriGetActivity ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+        if(GroupsTab.getGroupID() == 0) {
+            Toast.makeText(SuggestedDailyActivity.this, "Please consider joining or creating a group first!",
+                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            SuggestedDailyActivity.FamilyConnectFetchTask taskPost = new SuggestedDailyActivity.FamilyConnectFetchTask();
+            String uriGetActivity = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
 
-        taskPost.execute(uriGetActivity);
+            taskPost.execute(uriGetActivity);
+        }
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         //Converts JSON string into a Activity object
@@ -174,7 +198,7 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
                     for(FamilyConnectActivitiesHttpResponse activities : act) {
 
                         Activity activity = new Activity(activities.getId(), activities.getActivitieName(), activities.getIcon(), activities.getCondition(),
-                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), HomeTab.getGroupName(), activities.getIsCompleted());
+                                activities.getTempLow(), activities.getTempHi(), activities.getCategory(), GroupsTab.getGroupsDropdownValue(), activities.getIsCompleted());
 
                         //Filter Temperature
                         if((Double.parseDouble(HomeTab.getTemperature()) >= Double.parseDouble(activities.getTempLow()) &&
@@ -232,9 +256,9 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
             super.onPostExecute(bitmap);
 
             if(isActivityFound) {
-                weatherTemp.setText("Temperature: " + "High: " + ((int) Double.parseDouble(activityTempHigh)) + "°F " + "Low: " + ((int) Double.parseDouble(activityTempLow)) + "°F");
-                weatherCondition.setText("Weather Condition:" + activityCondition);
-                weatherSummary.setText("Weather Summary: " + HomeTab.getSummary());
+                weatherSummary.setText("Weather Summary: " + HomeTab.getSummary() + "\nCurrently: " + HomeTab.getTemperature() + "°F");
+                weatherTemp.setText("Activity Temperature: " + "High: " + ((int) Double.parseDouble(activityTempHigh)) + "°F " + "Low: " + ((int) Double.parseDouble(activityTempLow)) + "°F");
+                weatherCondition.setText("Activity Weather Condition:" + activityCondition);
                 activityTitle.setText(activityName);
             }
             else {

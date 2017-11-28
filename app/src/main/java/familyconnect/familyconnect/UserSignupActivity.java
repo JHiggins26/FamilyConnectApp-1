@@ -26,7 +26,13 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class UserSignupActivity extends AppCompatActivity {
 
     private EditText nameText;
@@ -38,12 +44,18 @@ public class UserSignupActivity extends AppCompatActivity {
     private Switch groupSwitch;
     private TextView loginLink;
     private RequestQueue queue;
-    private boolean POST, GROUP_POST = false;
+    private boolean POST, GROUP_POST, GROUP_POST_JOIN = false;
     private boolean isCreateGroup = true;
     private static int ID;
     private static String EMAIL, TOKEN;
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,6 +143,7 @@ public class UserSignupActivity extends AppCompatActivity {
         taskPost.execute(uriPost);
         POST = true;
         GROUP_POST = false;
+        GROUP_POST_JOIN = false;
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -140,11 +153,17 @@ public class UserSignupActivity extends AppCompatActivity {
                             UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
                             String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/groups";
                             taskPost.execute(uriPost);
-                            POST = false;
                             GROUP_POST = true;
+                            POST = false;
+                            GROUP_POST_JOIN = false;
                         }
                         else {
-                            //Do Nothing
+                            UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
+                            String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/usergroup";
+                            taskPost.execute(uriPost);
+                            GROUP_POST_JOIN = true;
+                            POST = false;
+                            GROUP_POST = false;
                         }
 
                         progressDialog.dismiss();
@@ -225,7 +244,12 @@ public class UserSignupActivity extends AppCompatActivity {
         return valid;
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         @Override
@@ -274,7 +298,7 @@ public class UserSignupActivity extends AppCompatActivity {
                         params.put("password_confirmation", confirm_passwordText.getText().toString());
 
                         if(!isCreateGroup) {
-                            params.put("group_id", groupIDText.getText().toString());
+                            //params.put("group_id", groupIDText.getText().toString());
                         }
 
                         return params;
@@ -319,6 +343,50 @@ public class UserSignupActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() {
                         Map<String, String>  params = new HashMap<String, String>();
                         params.put("group_name", groupNameText.getText().toString());
+
+                        return params;
+                    }
+                };
+                queue.add(postRequest);
+            }
+
+
+            if (GROUP_POST_JOIN) {
+
+                StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
+                        new Response.Listener<String>()
+                        {
+                            @Override
+                            public void onResponse(String response) {
+
+                                Log.d("GROUP POST REQUEST", response);
+                            }
+                        },
+                        new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                                Log.d("Error.Response", "" + error);
+                            }
+                        }
+                ) {
+
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("X-User-Email", emailText.getText().toString());
+                        headers.put("X-User-Token", TOKEN);
+
+                        return headers;
+                    }
+
+                    //PASS PARAMETERS
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String>  params = new HashMap<String, String>();
+                        params.put("user_id", ID+"");
+                        params.put("group_id", groupIDText.getText().toString());
 
                         return params;
                     }

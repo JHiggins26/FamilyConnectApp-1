@@ -1,6 +1,13 @@
 package familyconnect.familyconnect;
 
 
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class Activity {
 
     private String name, weatherIcon, weatherSummary, tempLow, tempHigh, group, category;

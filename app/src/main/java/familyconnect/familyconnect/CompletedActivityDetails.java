@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,22 +14,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * CompletedActivityDetails.java - a class that displays the details of each completed activity selected.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class CompletedActivityDetails extends AppCompatActivity implements View.OnClickListener {
 
     private TextView activityTitle, weatherSummary, highTemp, lowTemp, group, category;
@@ -41,32 +42,34 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
     private RequestQueue queue;
 
 
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_completed_details);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        activityTitle = (TextView) findViewById(R.id.activityDetailsTitle);
+        activityTitle = findViewById(R.id.activityDetailsTitle);
+        weatherIcon = findViewById(R.id.weatherImage);
+        weatherSummary = findViewById(R.id.weatherSummary);
+        lowTemp = findViewById(R.id.low_temp_desc);
+        highTemp = findViewById(R.id.high_temp_desc);
+        group = findViewById(R.id.groupDesc);
+        category = findViewById(R.id.categoryDesc);
+        buttonDelete = findViewById(R.id.x_button);
+        buttonAdd = findViewById(R.id.add_button);
 
-        weatherIcon = (ImageView) findViewById(R.id.weatherImage);
-        weatherSummary = (TextView) findViewById(R.id.weatherSummary);
-        lowTemp = (TextView) findViewById(R.id.low_temp_desc);
-        highTemp = (TextView) findViewById(R.id.high_temp_desc);
-
-        group = (TextView) findViewById(R.id.groupDesc);
-        category = (TextView) findViewById(R.id.categoryDesc);
-
-
-        buttonDelete = (Button) findViewById(R.id.x_button);
         buttonDelete.setOnClickListener(this);
-
-        buttonAdd = (Button) findViewById(R.id.add_button);
         buttonAdd.setOnClickListener(this);
 
         queue = Volley.newRequestQueue(this);
-
 
         activityTitle.setText(CompletedActivities.getActivityDetailsTitle() + " Details");
         setWeatherImage(CompletedActivities.getActivityWeatherIcon());
@@ -77,6 +80,13 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
         group.setText(CompletedActivities.getActivityGroup());
     }
 
+    /**
+     * @method onClick()
+     *
+     * This method is a click listener that listens for what buttons are pressed.
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -98,7 +108,7 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                                 PUT = false;
 
                                 CompletedActivityDetails.FamilyConnectFetchTask taskGet = new CompletedActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
                                 taskGet.execute(uriDelete);
                             }
                         })
@@ -126,7 +136,7 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                                 PUT = true;
 
                                 CompletedActivityDetails.FamilyConnectFetchTask taskGet = new CompletedActivityDetails.FamilyConnectFetchTask();
-                                String uriPut ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
+                                String uriPut ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
                                 taskGet.execute(uriPut);
                             }
                         })
@@ -141,6 +151,13 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * @method setWeatherImage()
+     *
+     * This method sets the icon that corresponds to what weather condition is chosen.
+     *
+     * @param condition
+     */
     public void setWeatherImage(String condition) {
 
         switch (condition) {
@@ -202,7 +219,12 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
         }
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         @Override
@@ -222,8 +244,6 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
 
                             @Override
                             public void onResponse(JSONObject response) {
-
-                                Toast.makeText(getApplicationContext(),activityTitle.getText(), Toast.LENGTH_SHORT).show();
 
                                 // response
                                 Log.d("DELETE", response.toString());
@@ -247,7 +267,6 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                         return headers;
                     }
                 };
-
                 queue.add(deleteRequest);
             }
 
@@ -280,7 +299,6 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                             }
                         }
                 ) {
-
                     @Override
                     public Map<String, String> getHeaders() {
                         Map<String, String> headers = new HashMap<String, String>();
@@ -307,10 +325,8 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
                         return "application/json";
                     }
                 };
-
                 queue.add(putRequest);
             }
-
             return null;
         }
 
@@ -323,7 +339,5 @@ public class CompletedActivityDetails extends AppCompatActivity implements View.
             CompletedActivityDetails.this.startActivity(displayActivityPage);
 
         }
-
     }
-
 }

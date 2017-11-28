@@ -1,78 +1,61 @@
 package familyconnect.familyconnect;
 
-import android.app.*;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
+
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.shapes.Shape;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.DataOutputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import io.apptik.widget.MultiSlider;
 
+/**
+ * CreateActivity.java - a class that creates each activity based on the weather condition chosen.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class CreateActivity extends AppCompatActivity {
 
-    private static EditText name;
-    private static TextView tempPercent, tempStatus, weatherConditionDropdownText;
-    private static Switch in_out_switch;
-    private static Spinner weatherConditionDropdown, groupDropdown;
-    private static MultiSlider weatherBar;
-    private static View tempCircle;
-    private static int tempHigh, tempLow, rightProgressValue, leftProgressValue;
-    private boolean isProgressValue = false;
+    private EditText name;
+    private TextView tempPercent, tempStatus, weatherConditionDropdownText;
+    private Switch in_out_switch;
+    private Spinner weatherConditionDropdown;
+    private MultiSlider weatherBar;
+    private int tempHigh, tempLow, rightProgressValue, leftProgressValue;
     private boolean POST = false;
-    private static boolean isCreated = false;
-    private String groupDropdownValue, weatherConditionDropdownValue;
-    private static boolean isUpdated = false, isOutdoor = true;
+    private String weatherConditionDropdownValue;
+    private boolean isOutdoor = true;
     private String weatherIcon;
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,24 +63,27 @@ public class CreateActivity extends AppCompatActivity {
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        in_out_switch = (Switch) findViewById(R.id.in_out_switch);
-
-        name = (EditText) findViewById(R.id.activityName);
-
-        weatherConditionDropdown = (Spinner) findViewById(R.id.weatherConditionDropdown);
-        weatherConditionDropdownText = (TextView) findViewById(R.id.weatherDropdownText);
-
-        weatherBar = (MultiSlider) findViewById(R.id.weatherBar);
-        tempPercent = (TextView) findViewById(R.id.tempPercent);
-        tempStatus = (TextView) findViewById(R.id.tempStatus);
-
+        in_out_switch = findViewById(R.id.in_out_switch);
+        name = findViewById(R.id.activityName);
+        weatherConditionDropdown = findViewById(R.id.weatherConditionDropdown);
+        weatherConditionDropdownText = findViewById(R.id.weatherDropdownText);
+        weatherBar = findViewById(R.id.weatherBar);
+        tempPercent = findViewById(R.id.tempPercent);
+        tempStatus = findViewById(R.id.tempStatus);
 
         setIndoorOutdoor();
         setWeatherConditionDropdown();
-        getTemperatureDegrees();
+        setTemperatureDegrees();
+        createActivity();
+    }
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    /**
+     * @method createActivity()
+     *
+     * This method creates each activity when all conditions are met.
+     */
+    public void createActivity() {
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,25 +95,29 @@ public class CreateActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                 } else {
 
-                    isCreated = true;
+                    if(GroupsTab.getGroupID() == 0) {
+                        Toast.makeText(CreateActivity.this, "Please consider joining or creating a group first!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        CreateActivity.FamilyConnectFetchTask taskPost = new CreateActivity.FamilyConnectFetchTask();
+                        String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
+                        taskPost.execute(uriPost);
+                        POST = true;
 
-                    CreateActivity.FamilyConnectFetchTask taskPost = new CreateActivity.FamilyConnectFetchTask();
-                    String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + UserLoginActivity.getGroupID() + "/activities";
-                    taskPost.execute(uriPost);
-                    POST = true;
-
-                    Snackbar.make(view, "Activity Created", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-
-                    DisplayActivitiesTab tab = new DisplayActivitiesTab();
-
-                    isUpdated = true;
+                        Snackbar.make(view, "Activity Created", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
                 }
             }
         });
     }
 
-
+    /**
+     * @method setIndoorOutdoor()
+     *
+     * This method checks if the activity is an indoor or outdoor activity.
+     */
     public void setIndoorOutdoor() {
 
         in_out_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -167,8 +157,11 @@ public class CreateActivity extends AppCompatActivity {
         });
     }
 
-
-
+    /**
+     * @method setWeatherConditionDropdown
+     *
+     * This method sets the value of the weather selected in the dropdown.
+     */
     public void setWeatherConditionDropdown() {
 
         ArrayList<String> options = new ArrayList<String>();
@@ -206,13 +199,11 @@ public class CreateActivity extends AppCompatActivity {
                 else if(weatherConditionDropdownValue.equals("Wind")) { weatherIcon = "wind"; }
                 else if(weatherConditionDropdownValue.equals("Fog")) { weatherIcon = "fog"; }
 
-
                 int index = weatherConditionDropdown.getSelectedItemPosition();
 
                 if(index > 0) {
                     weatherConditionDropdownText.setText("");
                     weatherConditionDropdownText.setBackgroundColor(Color.WHITE);
-
                 }
                 else {
                     if(isOutdoor) {
@@ -231,8 +222,12 @@ public class CreateActivity extends AppCompatActivity {
         });
     }
 
-
-    public void getTemperatureDegrees() {
+    /**
+     * @method getTemperatureDegrees()
+     *
+     * This method sets the temperature of the activity based on the slider values.
+     */
+    public void setTemperatureDegrees() {
 
         tempHigh = 100;
         tempLow = 0;
@@ -308,13 +303,18 @@ public class CreateActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //POST REQUEST FOR CREATING ACTIVITY
             if (POST) {
@@ -323,7 +323,6 @@ public class CreateActivity extends AppCompatActivity {
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
-                    //connection.addRequestProperty("Content-Type", "application/json");
                     connection.addRequestProperty("X-User-Email", UserLoginActivity.getEmail());
                     connection.addRequestProperty("X-User-Token", UserLoginActivity.getToken());
                     connection.setDoOutput(true);
@@ -332,7 +331,6 @@ public class CreateActivity extends AppCompatActivity {
                     int user_id = UserLoginActivity.getID();
                     String activityName = name.getText().toString();
                     String activityCategory = in_out_switch.getText().toString();
-                    String activityGroupName = groupDropdownValue;
                     String activityWeatherCondition = weatherConditionDropdownValue;
                     int high = tempHigh;
                     int low = tempLow;
@@ -342,9 +340,7 @@ public class CreateActivity extends AppCompatActivity {
                     String urlParameters = "activitie_name=" + activityName + "&user_id=" + user_id + "&condition=" + activityWeatherCondition
                             + "&category=" + activityCategory +  "&tempHi=" + high + "&tempLow=" + low + "&isCompleted=" + completed + "&icon=" + icon;
 
-
                     DataOutputStream dataStream = new DataOutputStream(connection.getOutputStream());
-
                     dataStream.write(urlParameters.getBytes());
                     dataStream.flush();
                     dataStream.close();
@@ -359,7 +355,6 @@ public class CreateActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
             return null;
         }
 
@@ -370,21 +365,20 @@ public class CreateActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @method dispatchTouchEvent
+     *
+     * This method hides the keyboard window when touched outside the keyboards coordinates.
+     *
+     * @param event
+     * @return dispatchTouchEvent(ev)
+     */
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
+    public boolean dispatchTouchEvent(MotionEvent event) {
         if (getCurrentFocus() != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
-        return super.dispatchTouchEvent(ev);
+        return super.dispatchTouchEvent(event);
     }
-
-    public static boolean getIsUpdated() {
-        return isUpdated;
-    }
-
-    public static void setIsUpdated(boolean isUpdated) {
-        CreateActivity.isUpdated = isUpdated;
-    }
-
 }

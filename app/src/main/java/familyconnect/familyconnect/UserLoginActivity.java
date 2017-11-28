@@ -42,7 +42,13 @@ import java.util.Map;
 import java.util.Scanner;
 import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
-
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class UserLoginActivity extends AppCompatActivity {
 
     private static final int REQUEST_SIGNUP = 0;
@@ -55,8 +61,15 @@ public class UserLoginActivity extends AppCompatActivity {
     private boolean GET, POST = false;
     private static int ID;
     private static String TOKEN;
-    private static String username, groupID;
+    private static String username;
 
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +138,7 @@ public class UserLoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                     }
                 }, 4000);
+
     }
 
 
@@ -153,7 +167,7 @@ public class UserLoginActivity extends AppCompatActivity {
     public void onLoginFailed() {
         passwordText.setText("");
 
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Login Failed", Toast.LENGTH_LONG).show();
 
         loginButton.setEnabled(true);
     }
@@ -181,7 +195,12 @@ public class UserLoginActivity extends AppCompatActivity {
         return valid;
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         //Converts JSON string into a Activity object
@@ -211,7 +230,7 @@ public class UserLoginActivity extends AppCompatActivity {
                         new Response.Listener<String>()
                         {
                             @Override
-                            public void onResponse(String response) {
+                            public void onResponse(final String response) {
 
                                 String jsonRequest [ ] = response.split(",");
 
@@ -223,6 +242,17 @@ public class UserLoginActivity extends AppCompatActivity {
                                 Log.v("TOKEN", jsonRequest[2].substring(24, jsonRequest[2].toString().length()-2));
 
                                 Log.d("POST REQUEST", response);
+
+                                new VolleyCallback() {
+
+                                    @Override
+                                    public void onSuccessResponse(String result) {
+
+                                        result = response;
+
+                                        Log.v("FUTURE WEATHER", result.toString());
+                                    }
+                                };
                             }
                         },
                         new Response.ErrorListener()
@@ -264,7 +294,6 @@ public class UserLoginActivity extends AppCompatActivity {
 
                                 try {
                                     username = response.getString("user_name");
-                                    groupID = response.getString("group_id");
 
                                     Intent homePage = new Intent(UserLoginActivity.this, GroupedActivities.class);
                                     UserLoginActivity.this.startActivity(homePage);
@@ -322,10 +351,5 @@ public class UserLoginActivity extends AppCompatActivity {
     public static String getUsername() {
         return username;
     }
-
-    public static String getGroupID() {
-        return groupID;
-    }
-
 
 }
