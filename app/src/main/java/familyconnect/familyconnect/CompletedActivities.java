@@ -1,82 +1,118 @@
 package familyconnect.familyconnect;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-import familyconnect.familyconnect.Widgets.DatePickerFragment;
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
-import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
+/**
+ * CompletedActivites.java - a class displays the activities that are marked completed.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class CompletedActivities extends AppCompatActivity {
 
-    private static ListView scrollView;
+    private ListView scrollView;
+    private TextView groupsTitle, completedText;
     private List<String> completedActivityNames;
     private List<Activity> completedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
-            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup, activityComplete;
+            activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
+    private static boolean activityComplete;
     private static long activityId;
 
-
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_completed_activities);
 
-        scrollView = (ListView) findViewById(R.id.activityScroll);
+        scrollView = findViewById(R.id.activityScroll);
+
+        groupsTitle = findViewById(R.id.groupsTitle);
+
+        completedText = findViewById(R.id.no_completed_activity);
 
         completedActivityList = new ArrayList<Activity>();
         completedActivityNames = new ArrayList<String>();
 
+        if(GroupsTab.getGroupID() == 0) {
+            groupsTitle.setText("Activity Group");
+        }
+        else {
+            groupsTitle.setText(GroupsTab.getGroupsDropdownValue() + " Group");
+
+        }
+
+
+            displayCompletedActivities();
+    }
+
+    /**
+     * @method displayCompletedActivities
+     *
+     * This method displays all activities that are marked completed.
+     */
+    public void displayCompletedActivities() {
+
+        int countCompleted = 0;
 
         completedActivityNames.clear();
         completedActivityList.clear();
 
+        if(DisplayActivitiesTab.getActivityList().size() == 0) {
+            completedText.setText("No Completed Activities");
+        }
+
         for(int i = 0; i < DisplayActivitiesTab.getActivityList().size(); i++) {
 
-            if(DisplayActivitiesTab.activityList.get(i).getCompleted().matches("true")) {
+            if(DisplayActivitiesTab.activityList.get(i).getCompleted() == true) {
 
                 completedActivityNames.add(DisplayActivitiesTab.activityList.get(i).getName());
 
-                Activity activity = new Activity(DisplayActivitiesTab.activityList.get(i).getId(), DisplayActivitiesTab.activityList.get(i).getName(),
-                        "ICON", DisplayActivitiesTab.activityList.get(i).getWeatherSummary(), DisplayActivitiesTab.activityList.get(i).getTempLow(),
-                        DisplayActivitiesTab.activityList.get(i).getTempHigh(), DisplayActivitiesTab.activityList.get(i).getCategory(),
-                        "N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
+                Activity activity;
+
+                if(GroupsTab.getGroupID() == 0) {
+                    activity = new Activity(DisplayActivitiesTab.activityList.get(i).getId(), DisplayActivitiesTab.activityList.get(i).getName(),
+                            DisplayActivitiesTab.activityList.get(i).getWeatherIcon(), DisplayActivitiesTab.activityList.get(i).getWeatherSummary(),
+                            DisplayActivitiesTab.activityList.get(i).getTempLow(), DisplayActivitiesTab.activityList.get(i).getTempHigh(),
+                            DisplayActivitiesTab.activityList.get(i).getCategory(), "N/A", DisplayActivitiesTab.activityList.get(i).getCompleted());
+                }
+                else {
+                    activity = new Activity(DisplayActivitiesTab.activityList.get(i).getId(), DisplayActivitiesTab.activityList.get(i).getName(),
+                            DisplayActivitiesTab.activityList.get(i).getWeatherIcon(), DisplayActivitiesTab.activityList.get(i).getWeatherSummary(),
+                            DisplayActivitiesTab.activityList.get(i).getTempLow(), DisplayActivitiesTab.activityList.get(i).getTempHigh(),
+                            DisplayActivitiesTab.activityList.get(i).getCategory(), GroupsTab.getGroupsDropdownValue(), DisplayActivitiesTab.activityList.get(i).getCompleted());
+                }
 
                 completedActivityList.add(activity);
+
+                completedText.setText("");
+
+                countCompleted++;
+            }
+            else {
+                if(countCompleted > 0) {
+                    //Do Nothing
+                }
+                else {
+                    completedText.setText("No Completed Activities");
+                }
             }
         }
 
@@ -106,7 +142,6 @@ public class CompletedActivities extends AppCompatActivity {
                 CompletedActivities.this.startActivity(showCompletedActivityPage);
             }
         });
-
     }
 
     public static long getActivityId() {
@@ -131,6 +166,6 @@ public class CompletedActivities extends AppCompatActivity {
         return activityCategory;
     }
     public static String getActivityGroup() { return activityGroup; }
-    public static String getActivityComplete() { return activityComplete; }
+    public static boolean getActivityComplete() { return activityComplete; }
 
 }

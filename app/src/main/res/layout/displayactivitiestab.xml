@@ -13,52 +13,17 @@
         android:id="@+id/groupsTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_alignEnd="@+id/star_icon"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="9dp"
+        android:layout_marginTop="16dp"
         android:text="Group (Name Here)"
         android:textAlignment="center"
+        android:textColor="#000000"
         android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <RelativeLayout
-        android:layout_width="220dp"
-        android:layout_height="36dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.01999998">
-
-        <TextView
-            android:id="@+id/completedActivities"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/star_icon"
-            android:clickable="true"
-            android:text="See Completed Activities"
-            android:textColor="#000000"
-            android:textSize="15dp" />
-
-        <ImageView
-            android:id="@+id/star_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/completedActivities"
-            android:layout_marginEnd="7dp"
-            android:background="@drawable/star_icon" />
-
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -67,6 +32,7 @@
         android:layout_height="47dp"
         android:text="Loading Activities..."
         android:textAlignment="center"
+        android:textColor="#000000"
         android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -77,14 +43,14 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/groupsTitle">
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3">
 
         <ListView
             android:id="@+id/activityScroll"
@@ -142,7 +108,42 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.99" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout3"
+        android:layout_width="220dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.878"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groupsTitle">
+
+        <TextView
+            android:id="@+id/completedActivities"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/star_icon"
+            android:clickable="true"
+            android:text="See Completed Activities"
+            android:textColor="#000000"
+            android:textSize="15dp" />
+
+        <ImageView
+            android:id="@+id/star_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/completedActivities"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/star_icon" />
+
+    </RelativeLayout>
 
 
 </android.support.constraint.ConstraintLayout>

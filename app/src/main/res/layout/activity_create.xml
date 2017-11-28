@@ -6,20 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ebebeb"
+    android:fillViewport="true"
     tools:context="familyconnect.familyconnect.CreateActivity">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/createLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/createTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:layout_alignTop="@+id/linearLayout"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily=""
                     android:text="Create Activity"
                     android:textAlignment="center"
@@ -32,26 +32,29 @@
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="125dp"
-                    android:layout_height="75dp"
+                    android:layout_width="150dp"
+                    android:layout_height="125dp"
                     android:layout_marginTop="8dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/create_activity_logo"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/createTitle"
-                    app:srcCompat="@drawable/create_activity_logo" />
+                    app:layout_constraintTop_toBottomOf="@+id/createTitle" />
 
                 <Switch
                     android:id="@+id/in_out_switch"
                     android:layout_width="162dp"
                     android:layout_height="28dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="Outdoor Activity"
                     android:textColor="#008F36"
                     android:textSize="15dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_bias="0.043"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -62,7 +65,7 @@
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="24dp"
                     android:background="#ffffff"
                     android:hint="activity name"
                     android:paddingLeft="5dp"
@@ -75,38 +78,6 @@
                     tools:layout_conversion_absoluteHeight="40dp"
                     tools:layout_conversion_absoluteWidth="330dp" />
 
-
-                <TextView
-                    android:id="@+id/groupDropdownText"
-                    android:layout_width="329dp"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#0c59cf"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="Select a group"
-                    android:textColor="#ffffff"
-                    android:textSize="20dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/groupDropdown"
-                    app:layout_constraintEnd_toEndOf="@+id/groupDropdown"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@+id/groupDropdown"
-                    app:layout_constraintTop_toTopOf="@+id/groupDropdown"
-                    app:layout_constraintVertical_bias="0.0" />
-
-                <Spinner
-                    android:id="@+id/groupDropdown"
-                    android:layout_width="329dp"
-                    android:layout_height="40dp"
-                    android:layout_below="@+id/groupDropdownText"
-                    android:layout_marginTop="32dp"
-                    android:popupBackground="#FFFF99"
-                    android:textAlignment="center"
-                    app:layout_constraintHorizontal_bias="0.516"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/activityName" />
 
                 <TextView
                     android:id="@+id/weatherDropdownText"
@@ -141,7 +112,7 @@
                     app:layout_constraintHorizontal_bias="0.516"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/groupDropdown" />
+                    app:layout_constraintTop_toBottomOf="@+id/activityName" />
 
 
                 <TextView
@@ -183,7 +154,7 @@
                     android:layout_height="25dp"
                     android:layout_marginEnd="24dp"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
                     app:drawThumbsApart="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -202,7 +173,7 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="24dp"
                     app:backgroundTint="#ffffff"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -49,7 +49,13 @@ import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/**
+ * Activity.java - a simple class that describes the Activity attributes.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class CreateActivitiesTab extends Fragment implements View.OnClickListener {
 
     private static EditText name, date, time, weather, category, group = null;
@@ -212,7 +218,12 @@ public class CreateActivitiesTab extends Fragment implements View.OnClickListene
         }
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         @Override

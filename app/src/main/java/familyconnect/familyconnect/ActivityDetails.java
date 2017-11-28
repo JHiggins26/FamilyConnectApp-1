@@ -14,28 +14,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
+/**
+ * ActivityDetails.java - a class that displays the details of each activity selected.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class ActivityDetails extends AppCompatActivity implements View.OnClickListener {
 
     private TextView activityTitle, weatherSummary, highTemp, lowTemp, group, category;
@@ -45,6 +43,13 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
     private RequestQueue queue;
 
 
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,16 +58,12 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(toolbar);
 
         activityTitle = (TextView) findViewById(R.id.activityDetailsTitle);
-
         weatherIcon = (ImageView) findViewById(R.id.weatherImage);
         weatherSummary = (TextView) findViewById(R.id.weatherSummary);
         lowTemp = (TextView) findViewById(R.id.low_temp_desc);
         highTemp = (TextView) findViewById(R.id.high_temp_desc);
-
         group = (TextView) findViewById(R.id.groupDesc);
         category = (TextView) findViewById(R.id.categoryDesc);
-
-
         buttonDelete = (Button) findViewById(R.id.x_button);
         buttonComplete = (Button) findViewById(R.id.check_button);
 
@@ -71,9 +72,8 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
 
         queue = Volley.newRequestQueue(this);
 
-
         activityTitle.setText(DisplayActivitiesTab.getActivityDetailsTitle() + " Details");
-        setWeatherImage("partly-cloudy-day");
+        setWeatherImage(DisplayActivitiesTab.getActivityWeatherIcon());
         weatherSummary.setText(DisplayActivitiesTab.getActivityWeatherSummary());
         lowTemp.setText(DisplayActivitiesTab.getActivityWeatherLow() + " °F");
         highTemp.setText(DisplayActivitiesTab.getActivityWeatherHigh() + " °F");
@@ -81,6 +81,13 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         group.setText(DisplayActivitiesTab.getActivityGroup());
     }
 
+    /**
+     * @method onClick()
+     *
+     * This method is a click listener that listens for what buttons are pressed.
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -102,7 +109,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = false;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
+                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
                                 taskGet.execute(uriDelete);
                             }
                         })
@@ -113,7 +120,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
-
                 break;
 
             case R.id.check_button:
@@ -131,8 +137,8 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                                 PUT = true;
 
                                 ActivityDetails.FamilyConnectFetchTask taskGet = new ActivityDetails.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/activities";
-                                taskGet.execute(uriDelete);
+                                String uriPut ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
+                                taskGet.execute(uriPut);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -142,11 +148,17 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
-
                 break;
         }
     }
 
+    /**
+     * @method setWeatherImage()
+     *
+     * This method sets the icon that corresponds to what weather condition is chosen.
+     *
+     * @param condition
+     */
     public void setWeatherImage(String condition) {
 
         switch (condition) {
@@ -176,45 +188,50 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                 weatherIcon.setImageResource(R.drawable.cloudy_icon);
                 break;
 
-//            case "rain":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "sleet":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "snow":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "wind":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
-//
-//            case "fog":
-//
-//                weatherIcon.setImageResource(R.drawable.);
-//                break;
+            case "rain":
 
-            default:
+                weatherIcon.setImageResource(R.drawable.rain_icon);
+                break;
 
-               // weatherIcon.setImageResource(R.drawable.);
+            case "sleet":
+
+                weatherIcon.setImageResource(R.drawable.sleet_icon);
+                break;
+
+            case "snow":
+
+                weatherIcon.setImageResource(R.drawable.snow_icon);
+                break;
+
+            case "wind":
+
+                weatherIcon.setImageResource(R.drawable.wind_icon);
+                break;
+
+            case "fog":
+
+                weatherIcon.setImageResource(R.drawable.fog_icon);
+                break;
+
+            case "Indoors":
+
+                weatherIcon.setImageResource(R.drawable.indoor_icon);
                 break;
         }
     }
 
-
+    /**
+     * @class FamilyConnectFetchTask
+     *
+     * This class performs an Async Task that calls the Restful Api
+     *
+     */
     private class FamilyConnectFetchTask extends AsyncTask<String, Void, Bitmap> {
 
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //PUT REQUEST
             if (PUT) {
@@ -222,13 +239,14 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                 final JSONObject jsonObject = new JSONObject();
 
                 try {
-                    jsonObject.put("url", "true");
+                    jsonObject.put("isCompleted", true);
 
-                }  catch (JSONException je) {
+                } catch (JSONException je) {
                     je.printStackTrace();
                 }
 
-                JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, params[0] + "/" + DisplayActivitiesTab.getActivityId(), jsonObject,
+                JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT,
+                        params[0] + "/" + DisplayActivitiesTab.getActivityId(), jsonObject,
                         new Response.Listener<JSONObject>() {
 
                             @Override
@@ -277,7 +295,7 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
             }
 
             //DELETE REQUEST
-            else if (DELETE) {
+            if (DELETE) {
 
                 final JSONObject jsonObject = new JSONObject();
 
@@ -288,8 +306,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
 
                             @Override
                             public void onResponse(JSONObject response) {
-
-                                Toast.makeText(getApplicationContext(),activityTitle.getText(), Toast.LENGTH_SHORT).show();
 
                                 // response
                                 Log.d("DELETE", response.toString());
@@ -314,8 +330,6 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
                     }
                 };
 
-
-
                 queue.add(deleteRequest);
             }
 
@@ -326,11 +340,10 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
+            HomeTab.setRunOnce(true);
             Intent displayActivityPage = new Intent(ActivityDetails.this, GroupedActivities.class);
             ActivityDetails.this.startActivity(displayActivityPage);
-
         }
-
     }
 
 }

@@ -33,9 +33,12 @@ public class FamilyConnectActivitiesHttpResponse {
     @SerializedName("tempLow")
     @Expose
     private String tempLow;
-    @SerializedName("url")
+    @SerializedName("isCompleted")
     @Expose
-    private String url;
+    private boolean isCompleted;
+    @SerializedName("icon")
+    @Expose
+    private String icon;
 
     public long getId() {
         return id;
@@ -109,12 +112,20 @@ public class FamilyConnectActivitiesHttpResponse {
         this.tempLow = tempLow;
     }
 
-    public String getUrl() {
-        return url;
+    public boolean getIsCompleted() {
+        return isCompleted;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setIsCompleted(boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
 }

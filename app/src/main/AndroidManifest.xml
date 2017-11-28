@@ -15,33 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".UserLoginActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".UserSignupActivity"></activity>
-
-        <!--<activity android:name=".Login">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
-        <activity android:name=".UserMainArea" />
+        <activity android:name=".UserSignupActivity" />
         <activity
             android:name=".GroupedActivities"
-            android:label="Family Connect"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Welcome"
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -58,6 +41,16 @@
             android:label="Family Connect"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".SuggestedDailyActivity" />
+        <activity android:name=".SuggestedFutureActivity"></activity>
+        <activity android:name=".JoinUser"
+            android:theme="@style/AppTheme.JoinUserTheme"></activity>
+        <activity android:name=".CreateGroup"
+            android:theme="@style/AppTheme.JoinUserTheme"></activity>
     </application>
 
 </manifest>
