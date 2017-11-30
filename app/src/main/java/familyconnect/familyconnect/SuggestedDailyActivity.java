@@ -1,15 +1,10 @@
 package familyconnect.familyconnect;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,21 +12,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,20 +22,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Set;
-
-import familyconnect.familyconnect.Widgets.DatePickerFragment;
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
-import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
+
 
 /**
- * Activity.java - a simple class that describes the Activity attributes.
+ * SuggestedDailyActivity.java - a class that suggested a daily activity based on the weather condition.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -64,15 +39,12 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     private boolean isActivity, isActivityFound = false;
     private TextView weatherTemp, weatherCondition, weatherSummary, activityTitle, tapSuggestion;
     private ImageButton activityImage;
-
     private String activityName, activityCondition, activityTempLow, activityTempHigh;
-
     private ArrayList<String> suggestedList = new ArrayList<String>();
-
     private MediaPlayer dailyActivitySound;
-
     private int nextActivity = 0;
     private boolean runOnce = false;
+
 
     /**
      * @method onCreate()
@@ -100,6 +72,13 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     }
 
 
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -121,6 +100,11 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
     }
 
 
+    /**
+     * @method filterActivity()
+     *
+     * This method sends a request to filter the activities based on the weather conditions.
+     */
     public void filterActivity() {
 
         isActivity = true;
@@ -136,6 +120,7 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
             taskPost.execute(uriGetActivity);
         }
     }
+
 
     /**
      * @class FamilyConnectFetchTask
@@ -156,7 +141,6 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
             return activity;
         }
 
-
         @Override
         protected Bitmap doInBackground(String... params) {
 
@@ -175,7 +159,6 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder json = new StringBuilder();
-
 
                     while ((line = reader.readLine()) != null) {
                         json.append(line);
@@ -267,6 +250,11 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
         }
     }
 
+    /**
+     * @method onBackPressed()
+     *
+     * This method is sets the page when the back button is pressed.
+     */
     @Override
     public void onBackPressed() {
         HomeTab.setRunOnce(true);
@@ -274,5 +262,4 @@ public class SuggestedDailyActivity extends AppCompatActivity implements View.On
         SuggestedDailyActivity.this.startActivity(homePage);
 
     }
-
 }

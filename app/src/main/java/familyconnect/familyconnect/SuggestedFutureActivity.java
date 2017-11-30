@@ -11,10 +11,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,13 +23,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-
 import familyconnect.familyconnect.Widgets.DatePickerFragment;
 import familyconnect.familyconnect.Widgets.TimePickerFragment;
 import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 /**
- * Activity.java - a simple class that describes the Activity attributes.
+ * SuggestedFutureActivity.java - a class that suggest a future activity based on the weather condition.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -79,6 +76,13 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
     }
 
 
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -100,6 +104,11 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
     }
 
 
+    /**
+     * @method filterActivity()
+     *
+     * This method sends a request to filter the activities based on the weather conditions.
+     */
     public void filterActivity() {
 
         isActivity = true;
@@ -115,6 +124,7 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
             taskPost.execute(uriGetActivity);
         }
     }
+
 
     /**
      * @class FamilyConnectFetchTask
@@ -134,7 +144,6 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
             FamilyConnectActivitiesHttpResponse activity = gson.fromJson(json, FamilyConnectActivitiesHttpResponse.class);
             return activity;
         }
-
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -249,6 +258,11 @@ public class SuggestedFutureActivity extends AppCompatActivity implements View.O
         }
     }
 
+    /**
+     * @method onBackPressed()
+     *
+     * This method is sets the page when the back button is pressed.
+     */
     @Override
     public void onBackPressed() {
         HomeTab.setRunOnce(true);

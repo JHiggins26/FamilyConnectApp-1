@@ -1,9 +1,16 @@
-
 package familyconnect.familyconnect.json;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
+/**
+ * FamilyConnectActivitiesHttpResponse.java - a class that allows a json response to be created as a gson object.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class FamilyConnectActivitiesHttpResponse {
 
     @SerializedName("id")

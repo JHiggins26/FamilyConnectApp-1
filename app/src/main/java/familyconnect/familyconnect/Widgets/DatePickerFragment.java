@@ -7,19 +7,30 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.widget.DatePicker;
-import android.widget.EditText;
-
 import java.util.Calendar;
 import java.util.Date;
 
-import familyconnect.familyconnect.CreateActivitiesTab;
-import familyconnect.familyconnect.R;
 
+/**
+ * DatePickerFragment.java - a class that gets the year, month and day using a calendar widget.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     private static Date dateRepresentation;
     private static String specialDateFormat, uniformDateFormat;
 
+    /**
+     * @method onCreateDialog()
+     *
+     * This method creates the android activity and initializes the year, month and day.
+     *
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
@@ -32,6 +43,16 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
+    /**
+     * @method onDateSet()
+     *
+     * This method sets the date.
+     *
+     * @param view
+     * @param year
+     * @param month
+     * @param day
+     */
     public void onDateSet(DatePicker view, int year, int month, int day) {
 
         uniformDateFormat = (month+1) + "-" + day + "-" + year;
@@ -68,7 +89,6 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getFragmentManager(),"TimePicker");
-
     }
 
 

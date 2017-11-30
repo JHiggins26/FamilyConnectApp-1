@@ -57,15 +57,15 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        activityTitle = (TextView) findViewById(R.id.activityDetailsTitle);
-        weatherIcon = (ImageView) findViewById(R.id.weatherImage);
-        weatherSummary = (TextView) findViewById(R.id.weatherSummary);
-        lowTemp = (TextView) findViewById(R.id.low_temp_desc);
-        highTemp = (TextView) findViewById(R.id.high_temp_desc);
-        group = (TextView) findViewById(R.id.groupDesc);
-        category = (TextView) findViewById(R.id.categoryDesc);
-        buttonDelete = (Button) findViewById(R.id.x_button);
-        buttonComplete = (Button) findViewById(R.id.check_button);
+        activityTitle = findViewById(R.id.activityDetailsTitle);
+        weatherIcon = findViewById(R.id.weatherImage);
+        weatherSummary = findViewById(R.id.weatherSummary);
+        lowTemp = findViewById(R.id.low_temp_desc);
+        highTemp = findViewById(R.id.high_temp_desc);
+        group = findViewById(R.id.groupDesc);
+        category = findViewById(R.id.categoryDesc);
+        buttonDelete = findViewById(R.id.x_button);
+        buttonComplete = findViewById(R.id.check_button);
 
         buttonDelete.setOnClickListener(this);
         buttonComplete.setOnClickListener(this);
@@ -345,5 +345,4 @@ public class ActivityDetails extends AppCompatActivity implements View.OnClickLi
             ActivityDetails.this.startActivity(displayActivityPage);
         }
     }
-
 }

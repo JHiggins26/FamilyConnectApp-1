@@ -49,6 +49,8 @@
         <activity android:name=".SuggestedFutureActivity"></activity>
         <activity android:name=".JoinUser"
             android:theme="@style/AppTheme.JoinUserTheme"></activity>
+        <activity android:name=".DeleteUser"
+            android:theme="@style/AppTheme.JoinUserTheme"></activity>
         <activity android:name=".CreateGroup"
             android:theme="@style/AppTheme.JoinUserTheme"></activity>
     </application>

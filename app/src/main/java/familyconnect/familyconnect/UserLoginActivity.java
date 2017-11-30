@@ -11,11 +11,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,25 +22,14 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import familyconnect.familyconnect.json.FamilyConnectHttpResponse;
 
 /**
- * Activity.java - a simple class that describes the Activity attributes.
+ * UserLoginActivity.java - a class that provides functionality for the user to login.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -63,6 +49,7 @@ public class UserLoginActivity extends AppCompatActivity {
     private static String TOKEN;
     private static String username;
 
+
     /**
      * @method onCreate()
      *
@@ -79,11 +66,10 @@ public class UserLoginActivity extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(this);
 
-        emailText = (EditText) findViewById(R.id.input_email);
-        passwordText = (EditText) findViewById(R.id.input_password);
-        loginButton = (Button) findViewById(R.id.btn_login);
-        signupLink = (TextView) findViewById(R.id.link_signup);
-
+        emailText = findViewById(R.id.input_email);
+        passwordText = findViewById(R.id.input_password);
+        loginButton = findViewById(R.id.btn_login);
+        signupLink = findViewById(R.id.link_signup);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -104,6 +90,12 @@ public class UserLoginActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * @method login()
+     *
+     * This method that sends a request for the user to login.
+     */
     public void login() {
 
         if (!validate()) {
@@ -113,57 +105,41 @@ public class UserLoginActivity extends AppCompatActivity {
 
         loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(UserLoginActivity.this,
-                R.style.AppTheme_PopupOverlay);//AppTheme_Dark_Dialog
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Signing in...");
-        progressDialog.show();
-
         UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
         String uriPost ="https://family-connect-ggc-2017.herokuapp.com/sessions";
         task.execute(uriPost);
         POST = true;
         GET = false;
 
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-
-                        UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
-                        String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
-                        task.execute(uriGet);
-                        POST = false;
-                        GET = true;
-
-                        progressDialog.dismiss();
-                    }
-                }, 4000);
-
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
-            }
-        }
-    }
-
+    /**
+     * @method onBackPressed()
+     *
+     * This method responds when the back button is pressed.
+     */
     @Override
     public void onBackPressed() {
         //Do Nothing
     }
 
+
+    /**
+     * @method onLoginSuccess()
+     *
+     * This method sets the login button back to enabled.
+     */
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
         finish();
     }
 
+    /**
+     * @method onLoginFailed()
+     *
+     * This method resets the password field and displays a failed message.
+     */
     public void onLoginFailed() {
         passwordText.setText("");
 
@@ -172,6 +148,13 @@ public class UserLoginActivity extends AppCompatActivity {
         loginButton.setEnabled(true);
     }
 
+    /**
+     * @method validate()
+     *
+     * This method validates the user's credentials to login.
+     *
+     * @return
+     */
     public boolean validate() {
         boolean valid = true;
 
@@ -222,10 +205,6 @@ public class UserLoginActivity extends AppCompatActivity {
             //POST REQUEST
             if (POST) {
 
-                //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
-                //@OnStart for creating a new session (do POST to (/SESSION))
-                //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
-
                 StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
                         new Response.Listener<String>()
                         {
@@ -243,16 +222,31 @@ public class UserLoginActivity extends AppCompatActivity {
 
                                 Log.d("POST REQUEST", response);
 
-                                new VolleyCallback() {
 
-                                    @Override
-                                    public void onSuccessResponse(String result) {
+                                final ProgressDialog progressDialog = new ProgressDialog(UserLoginActivity.this,
+                                        R.style.AppTheme_PopupOverlay);
+                                progressDialog.setIndeterminate(true);
+                                progressDialog.setMessage("Signing in...");
+                                progressDialog.show();
 
-                                        result = response;
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
 
-                                        Log.v("FUTURE WEATHER", result.toString());
-                                    }
-                                };
+                                                if(((Integer) ID != null) && (TOKEN != null)) {
+                                                    UserLoginActivity.FamilyConnectFetchTask task = new UserLoginActivity.FamilyConnectFetchTask();
+                                                    String uriGet ="https://family-connect-ggc-2017.herokuapp.com/users";
+                                                    task.execute(uriGet);
+                                                    POST = false;
+                                                    GET = true;
+                                                }
+                                                else {
+                                                    onLoginFailed();
+                                                }
+
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
                             }
                         },
                         new Response.ErrorListener()
@@ -330,7 +324,6 @@ public class UserLoginActivity extends AppCompatActivity {
             return null;
         }
 
-
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
@@ -351,5 +344,4 @@ public class UserLoginActivity extends AppCompatActivity {
     public static String getUsername() {
         return username;
     }
-
 }

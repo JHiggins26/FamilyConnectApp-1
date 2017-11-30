@@ -1,14 +1,11 @@
 package familyconnect.familyconnect;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,33 +15,26 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import familyconnect.familyconnect.Widgets.TimePickerFragment;
-
 
 /**
- * GroupsTab.java - a class that displays all the group members associated to the group.
+ * GroupsTab.java - a class that displays all the group members associated to a group.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -56,9 +46,9 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
     private static TextView groupsIdTitle;
     private ListView membersListview;
     private ImageButton deleteGroupBtn, addUserBtn;
-    private Spinner groupsDropdown;
+    private static Spinner groupsDropdown;
     private RequestQueue queue;
-    private boolean isDeleteGroup, isDeleteUser, isGroupDropdown, isPopulateUsers = false;
+    private boolean isGroupDropdown, isPopulateUsers = false;
     private static String groupsDropdownValue;
     private ArrayList<String> groupList = new ArrayList<String>();
     private Map<String, Long> groupPairList = new LinkedHashMap<String, Long>();
@@ -66,8 +56,7 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
     private long groupID;
     private static long groupNum = 0;
     private String groupName, userName;
-    private int groupPosition, countLoop = 0;
-
+    private int countLoop = 0;
 
 
     /**
@@ -96,8 +85,6 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
         deleteGroupBtn.setOnClickListener(this);
         groupsDropdown.setOnTouchListener(this);
 
-
-
         if(GroupsTab.getGroupID() == 0 ) {
             groupsTitle.setText("Activity Group Members");
             userIdTitle.setText("User ID#: " + UserLoginActivity.getID());
@@ -109,11 +96,17 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
             groupsIdTitle.setText("Group ID#: " + groupNum);
         }
 
-
         return rootView;
     }
 
 
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -126,30 +119,7 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                             Toast.LENGTH_LONG).show();
                 }
                 else {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(getActivity());
-                    }
-                    builder.setTitle("Delete Group")
-                            .setMessage("Are you sure you want to delete this " + GroupsTab.getGroupsDropdownValue() + " group?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    isDeleteGroup = true;
-
-                                    GroupsTab.FamilyConnectFetchTask taskGet = new GroupsTab.FamilyConnectFetchTask();
-                                    String uriDelete = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID();
-                                    taskGet.execute(uriDelete);
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
+                    startActivity(new Intent(getActivity(), DeleteUser.class));
                 }
                 break;
 
@@ -160,6 +130,16 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
         }
     }
 
+
+    /**
+     * @method onTouch()
+     *
+     * This method provides a specific functionality for when the Spinner (Dropdown) is touched.
+     *
+     * @param v
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
 
@@ -170,10 +150,11 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
         return false;
     }
 
+
     /**
      * @method setGroups
      *
-     * This method selects the group the user would like to display.
+     * This method get a request for the group the user would like to display.
      */
     public void setGroups() {
 
@@ -187,6 +168,13 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
     }
 
 
+    /**
+     * @method getUsers()
+     *
+     * This method updates the Spinner (Dropdown) with the correct group names.
+     *
+     * @param j
+     */
     private void getUsers(JSONArray j) {
 
         groupList.add("");
@@ -215,9 +203,6 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                 isPopulateUsers = true;
                 isGroupDropdown = false;
                 countLoop = 0;
-
-                Log.v("POSITION", position+"");
-
                 groupNum = 0;
 
                 if(position > 1) {
@@ -241,18 +226,16 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                     groupsDropdownText.setText("");
                     groupsDropdownText.setBackgroundColor(Color.WHITE);
 
-                    groupPosition = position;
-
                     groupsDropdownValue = groupsDropdown.getSelectedItem().toString();
 
                     groupsTitle.setText(groupsDropdownValue + " Group Members");
                     groupsIdTitle.setText("Group ID#: " + groupNum);
                     membersListview.setVisibility(View.VISIBLE);
 
-
                     DisplayActivitiesTab.getNonCompletedActivityList().clear();
+
                     Toast.makeText(getActivity(), "Group Changed!",
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
                 else if (position == 1) {
                     groupsDropdownText.setText("");
@@ -272,12 +255,9 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                     groupsIdTitle.setText("Group ID#: N/A");
                     groupsDropdownText.setBackgroundColor(Color.parseColor("#0c59cf"));
                     membersListview.setVisibility(View.INVISIBLE);
-
-//                    Toast.makeText(getActivity(), "No Group Selected!",
-//                            Toast.LENGTH_SHORT).show();
                 }
-
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -289,7 +269,7 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
     /**
      * @method populateGroupUsers()
      *
-     * This method populates all members associated to the group and displays them.
+     * This method populates all members associated to the group and displays them in a List View.
      */
     public void populateGroupUsers() {
 
@@ -299,40 +279,6 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                 R.layout.usergrouplist, R.id.listText, userList);
 
         membersListview.setAdapter(arrayAdapter);
-
-        membersListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
-                } else {
-                    builder = new AlertDialog.Builder(getActivity());
-                }
-                builder.setTitle("Delete User")
-                        .setMessage("Are you sure you want to delete this user?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                isDeleteUser = true;
-
-                                GroupsTab.FamilyConnectFetchTask taskGet = new GroupsTab.FamilyConnectFetchTask();
-                                String uriDelete ="https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID();
-                                taskGet.execute(uriDelete);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-
-
     }
 
 
@@ -348,7 +294,7 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //GET REQUEST FOR GROUP USERS
             if (isGroupDropdown) {
@@ -448,50 +394,8 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
                 queue.add(getRequest);
             }
 
-
-
-
-
-            //DELETE REQUEST FOR GROUP
-          /*  if (isDeleteGroup) {
-
-                final JSONObject jsonObject = new JSONObject();
-
-                JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
-                        params[0], jsonObject,
-
-                        new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                                // response
-                                Log.d("DELETE", response.toString());
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // error
-                                Log.d("Error.Response", error.toString());
-                            }
-                        }
-                ) {
-                    @Override
-                    public Map<String, String> getHeaders() {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        headers.put("Content-Type", "application/json");
-                        headers.put("X-User-Email", UserLoginActivity.getEmail());
-                        headers.put("X-User-Token", UserLoginActivity.getToken());
-
-                        return headers;
-                    }
-                };
-                queue.add(deleteRequest);
-            }*/
             return null;
         }
-
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
@@ -516,5 +420,7 @@ public class GroupsTab extends Fragment implements View.OnClickListener, View.On
         return groupsDropdownValue;
     }
 
+    public static Spinner getGroupsDropdown() {
+        return groupsDropdown;
+    }
 }
-
