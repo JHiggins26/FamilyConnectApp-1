@@ -1,30 +1,37 @@
 package familyconnect.familyconnect.Widgets;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.support.v4.app.DialogFragment;
 import android.app.Dialog;
 import java.util.Calendar;
 import android.widget.TimePicker;
-
-import familyconnect.familyconnect.CreateActivitiesTab;
 import familyconnect.familyconnect.HomeTab;
-import familyconnect.familyconnect.R;
-import familyconnect.familyconnect.SuggestedFutureActivity;
 
 
+/**
+ * TimePickerFragment.java - a class that gets the time from a clock widget.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
 
     private static String time;
     private static String specialTimeFormat;
     private static String aMpM = "AM";
 
+
+    /**
+     * @method onCreateDialog()
+     *
+     * This method creates the android activity and initializes the hour and minute.
+     *
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         //Use the current time as the default values for the time picker
@@ -36,7 +43,15 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         return new TimePickerDialog(getActivity(),this, hour, minute, DateFormat.is24HourFormat(getActivity()));
     }
 
-    //onTimeSet() callback method
+    /**
+     * @method onTimeSet()
+     *
+     * This method sets the time.
+     *
+     * @param view
+     * @param hourOfDay
+     * @param minute
+     */
     public void onTimeSet(TimePicker view, int hourOfDay, int minute){
 
         //This variable plugs into the weather api URL
@@ -116,7 +131,6 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         }
 
         HomeTab.getFutureBtn().performClick();
-
     }
 
 

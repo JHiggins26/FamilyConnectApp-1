@@ -105,6 +105,7 @@ public class CreateActivity extends AppCompatActivity {
                         taskPost.execute(uriPost);
                         POST = true;
 
+                        name.setText("");
                         Snackbar.make(view, "Activity Created", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
@@ -223,7 +224,7 @@ public class CreateActivity extends AppCompatActivity {
     }
 
     /**
-     * @method getTemperatureDegrees()
+     * @method setTemperatureDegrees()
      *
      * This method sets the temperature of the activity based on the slider values.
      */

@@ -43,9 +43,7 @@ public class CompletedActivities extends AppCompatActivity {
         setContentView(R.layout.activity_completed_activities);
 
         scrollView = findViewById(R.id.activityScroll);
-
         groupsTitle = findViewById(R.id.groupsTitle);
-
         completedText = findViewById(R.id.no_completed_activity);
 
         completedActivityList = new ArrayList<Activity>();
@@ -59,8 +57,7 @@ public class CompletedActivities extends AppCompatActivity {
 
         }
 
-
-            displayCompletedActivities();
+        displayCompletedActivities();
     }
 
     /**

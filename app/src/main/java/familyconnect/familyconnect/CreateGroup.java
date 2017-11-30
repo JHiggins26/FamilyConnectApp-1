@@ -7,31 +7,39 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * CreateGroup.java - a class that allow the user to create a new group.
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class CreateGroup extends android.app.Activity implements View.OnClickListener{
 
     private EditText input_group_name;
     private ImageButton create_button, cancel_button;
-    private boolean isJoin = true;
     private RequestQueue queue;
 
 
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +61,16 @@ public class CreateGroup extends android.app.Activity implements View.OnClickLis
         int height = dm.heightPixels;
 
         getWindow().setLayout((int)(width*0.8),(int)(height*0.6));
-
     }
 
 
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -72,6 +86,11 @@ public class CreateGroup extends android.app.Activity implements View.OnClickLis
     }
 
 
+    /**
+     * @method handleRequest()
+     *
+     * This method handles the request when the create button is clicked.
+     */
     public void handleRequest() {
 
         if (!input_group_name.getText().toString().equals("")) {
@@ -99,7 +118,7 @@ public class CreateGroup extends android.app.Activity implements View.OnClickLis
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //POST REQUEST
             StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
@@ -110,7 +129,9 @@ public class CreateGroup extends android.app.Activity implements View.OnClickLis
 
                             Toast.makeText(CreateGroup.this, "Group Created!",
                                     Toast.LENGTH_LONG).show();
-                            Log.d("POST REQUEST", response);
+
+                            GroupsTab.getGroupsDropdown().setSelection(0);
+                            Log.d("POST", response);
                         }
                     },
                     new Response.ErrorListener()

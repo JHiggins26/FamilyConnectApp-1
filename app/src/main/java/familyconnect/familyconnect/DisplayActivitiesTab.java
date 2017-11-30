@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedInputStream;
@@ -48,12 +46,12 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
     private TextView groupsTitle, loadingText;
     private TextView completedActivitiesBtn;
     private ImageView starBtn;
-    private boolean GET = false;
     protected List<String> jsonArray;
     public static List<Activity> activityList, nonCompletedActivityList;
     private static String activityDetailsTitle, activityWeatherIcon, activityWeatherSummary,
             activityWeatherLow, activityWeatherHigh, activityCategory, activityGroup;
     private static boolean activityComplete;
+    private boolean GET = false;
     private static long activityId;
 
 
@@ -129,7 +127,6 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
             String uriGet = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
             taskGet.execute(uriGet);
         }
-
     }
 
     /**
@@ -168,12 +165,12 @@ public class DisplayActivitiesTab extends Fragment implements SwipeRefreshLayout
                 String uriGet = "https://family-connect-ggc-2017.herokuapp.com/users/" + UserLoginActivity.getID() + "/groups/" + GroupsTab.getGroupID() + "/activities";
                 taskGet.execute(uriGet);
             }
-
         }
         else {
             //Do Nothing
         }
     }
+
 
     /**
      * @method onClick()

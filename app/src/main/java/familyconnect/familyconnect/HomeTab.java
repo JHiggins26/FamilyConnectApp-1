@@ -27,40 +27,21 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-
 import familyconnect.familyconnect.Widgets.DatePickerFragment;
 import familyconnect.familyconnect.Widgets.TimePickerFragment;
-import familyconnect.familyconnect.json.FamilyConnectActivitiesHttpResponse;
 
 
 /**
- * HomeTab.java - a class that displays the users .
+ * HomeTab.java - a class that displays the main functions of the app.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -163,14 +144,19 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
         dailyActivitySound = MediaPlayer.create(getActivity(), R.raw.daily_activity_sound);
 
-
         getGPSLocation();
         getWeather();
-
 
         return rootView;
     }
 
+    /**
+     * @method setUserVisibleHint()
+     *
+     * This method notifies the DOM when the Display Tab is shown.
+     *
+     * @param isVisibleToUser
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -190,6 +176,13 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     }
 
 
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
 
@@ -321,6 +314,11 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     }
 
 
+    /**
+     * @method getWeather()
+     *
+     * THis method fetches the daily weather.
+     */
     public void getWeather() {
 
         isWeather = true;
@@ -334,6 +332,11 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     }
 
 
+    /**
+     * @method getFutureWeather()
+     *
+     * THis method fetches the future weather.
+     */
     public void getFutureWeather() {
 
         isFutureWeather = true;
@@ -362,6 +365,11 @@ public class HomeTab extends Fragment implements View.OnClickListener {
     }
 
 
+    /**
+     * @method getGPSLocation()
+     *
+     * THis method fetches the GPS location.
+     */
     public void getGPSLocation() {
 
         gps = new GPSLocation(getActivity());
@@ -398,10 +406,19 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         }
     }
 
+
+    /**
+     * @method showDatePickerDialog
+     *
+     * This method displays the calendar modal to set a date.
+     *
+     * @param v
+     */
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getFragmentManager(), "datePicker");
     }
+
 
     /**
      * @class FamilyConnectFetchTask
@@ -415,8 +432,7 @@ public class HomeTab extends Fragment implements View.OnClickListener {
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
-
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //GET REQUEST FOR WEATHER
             if (isWeather) {
@@ -538,7 +554,6 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
             return null;
         }
-
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {

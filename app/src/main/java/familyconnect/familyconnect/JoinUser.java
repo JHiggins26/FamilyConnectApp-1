@@ -1,41 +1,32 @@
 package familyconnect.familyconnect;
 
 
-import android.app.*;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * JoinUser.java - a class that displays the users .
+ *
+ * @author  Jawan Higgins
+ * @version 1.0
+ * @created 2017-11-23
+ */
 public class JoinUser extends android.app.Activity implements View.OnClickListener{
 
     private EditText input_group_ID;
@@ -43,6 +34,13 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
     private RequestQueue queue;
 
 
+    /**
+     * @method onCreate()
+     *
+     * This method creates the android activity and initializes each instance variable.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +49,6 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
         input_group_ID = findViewById(R.id.input_group_ID);
         join_add_button = findViewById(R.id.join_add_button);
         cancel_button = findViewById(R.id.cancel_button);
-
 
         queue = Volley.newRequestQueue(this);
 
@@ -65,11 +62,16 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
         int height = dm.heightPixels;
 
         getWindow().setLayout((int)(width*0.8),(int)(height*0.6));
-
     }
 
 
-
+    /**
+     * @method onClick()
+     *
+     * This method provides a specific functionality for each button that is clicked
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -85,6 +87,11 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
     }
 
 
+    /**
+     * @method handleRequest()
+     *
+     * This method handles the request when the join button is clicked.
+     */
     public void handleRequest() {
 
         if (!input_group_ID.getText().toString().equals("")) {
@@ -100,7 +107,6 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
     }
 
 
-
     /**
      * @class FamilyConnectFetchTask
      *
@@ -112,7 +118,7 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //POST REQUEST
             StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
@@ -131,7 +137,7 @@ public class JoinUser extends android.app.Activity implements View.OnClickListen
                         @Override
                         public void onErrorResponse(VolleyError error) {
 
-                            Toast.makeText(JoinUser.this, "Invalid Group ID#: Join Failed!",
+                            Toast.makeText(JoinUser.this, "Group doesn't exist! Join Failed!",
                                     Toast.LENGTH_LONG).show();
 
                             Log.d("Error.Response", "" + error);

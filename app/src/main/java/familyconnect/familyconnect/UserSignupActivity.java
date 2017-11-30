@@ -2,7 +2,6 @@ package familyconnect.familyconnect;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -26,8 +24,9 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
- * Activity.java - a simple class that describes the Activity attributes.
+ * UserSignupActivity.java - a class that allows the users to signup to create an account.
  *
  * @author  Jawan Higgins
  * @version 1.0
@@ -63,20 +62,17 @@ public class UserSignupActivity extends AppCompatActivity {
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        nameText = (EditText) findViewById(R.id.input_name);
-        emailText = (EditText) findViewById(R.id.input_email);
-        passwordText = (EditText) findViewById(R.id.input_password);
-        confirm_passwordText = (EditText) findViewById(R.id.input_confirm_password);
-        groupSwitch = (Switch) findViewById(R.id.group_switch);
-        groupNameText = (EditText) findViewById(R.id.input_group_name);
-        groupIDText = (EditText) findViewById(R.id.input_group_ID);
-        signupButton = (Button) findViewById(R.id.btn_signup);
-        loginLink = (TextView) findViewById(R.id.link_login);
-
-        setGroupSwitch();
+        nameText = findViewById(R.id.input_name);
+        emailText = findViewById(R.id.input_email);
+        passwordText = findViewById(R.id.input_password);
+        confirm_passwordText = findViewById(R.id.input_confirm_password);
+        groupSwitch = findViewById(R.id.group_switch);
+        groupNameText = findViewById(R.id.input_group_name);
+        groupIDText = findViewById(R.id.input_group_ID);
+        signupButton = findViewById(R.id.btn_signup);
+        loginLink = findViewById(R.id.link_login);
 
         queue = Volley.newRequestQueue(this);
-
 
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,9 +88,16 @@ public class UserSignupActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        setGroupSwitch();
     }
 
 
+    /**
+     * @method setGroupSwitch()
+     *
+     * This method allows the user to join or create a group.
+     */
     public void setGroupSwitch() {
 
         groupSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -123,6 +126,11 @@ public class UserSignupActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * @method signup()
+     *
+     * This method determines if the user's credentials are valid.
+     */
     public void signup() {
 
         if (!validate()) {
@@ -132,58 +140,34 @@ public class UserSignupActivity extends AppCompatActivity {
 
         signupButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(UserSignupActivity.this,
-                R.style.AppTheme_PopupOverlay);//AppTheme_Dark_Dialog
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Creating Account...");
-        progressDialog.show();
-
         UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
         String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users";
         taskPost.execute(uriPost);
         POST = true;
         GROUP_POST = false;
         GROUP_POST_JOIN = false;
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-
-                        if(isCreateGroup) {
-                            UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
-                            String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/groups";
-                            taskPost.execute(uriPost);
-                            GROUP_POST = true;
-                            POST = false;
-                            GROUP_POST_JOIN = false;
-                        }
-                        else {
-                            UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
-                            String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/usergroup";
-                            taskPost.execute(uriPost);
-                            GROUP_POST_JOIN = true;
-                            POST = false;
-                            GROUP_POST = false;
-                        }
-
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
     }
 
 
-    public void onSignupSuccess() {
-        signupButton.setEnabled(true);
-        setResult(RESULT_OK, null);
-        finish();
-    }
-
+    /**
+     * @method onSignupFailed()
+     *
+     * This method displays a failed message when the user's credentials are not valid.
+     */
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), "Sign up failed", Toast.LENGTH_LONG).show();
 
         signupButton.setEnabled(true);
     }
 
+
+    /**
+     * @method validate()
+     *
+     * This method validates the user's credentials to assure the criteria is met.
+     *
+     * @return
+     */
     public boolean validate() {
         boolean valid = true;
 
@@ -244,6 +228,7 @@ public class UserSignupActivity extends AppCompatActivity {
         return valid;
     }
 
+
     /**
      * @class FamilyConnectFetchTask
      *
@@ -255,14 +240,10 @@ public class UserSignupActivity extends AppCompatActivity {
         @Override
         protected Bitmap doInBackground(String... params) {
 
-            Log.v("FamilyConnect", "URL = " + params[0]);
+            Log.v("FamilyConnect", "URI = " + params[0]);
 
             //POST REQUEST
             if (POST) {
-
-                //Before POST make sure I get the User email and password ****Can save USERNAME and PASSWORD on phones persistent memory to auto login***
-                //@OnStart for creating a new session (do POST to (/SESSION))
-                //When closing the app to a DELETE on (/sessions) in @OnStop and @OnDestroy override
 
                 StringRequest postRequest = new StringRequest(Request.Method.POST, params[0],
                         new Response.Listener<String>()
@@ -276,13 +257,51 @@ public class UserSignupActivity extends AppCompatActivity {
                                 TOKEN = jsonRequest[5].substring(24, jsonRequest[5].toString().length()-1);
 
                                 Log.d("POST REQUEST", response);
+
+
+                                final ProgressDialog progressDialog = new ProgressDialog(UserSignupActivity.this,
+                                        R.style.AppTheme_PopupOverlay);
+                                progressDialog.setIndeterminate(true);
+                                progressDialog.setMessage("Creating Account...");
+                                progressDialog.show();
+
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+
+                                                if(((Integer) ID != null) && (EMAIL != null) && (TOKEN != null) ) {
+                                                    if (isCreateGroup) {
+                                                        UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
+                                                        String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/groups";
+                                                        taskPost.execute(uriPost);
+                                                        GROUP_POST = true;
+                                                        POST = false;
+                                                        GROUP_POST_JOIN = false;
+                                                    } else {
+                                                        UserSignupActivity.FamilyConnectFetchTask taskPost = new UserSignupActivity.FamilyConnectFetchTask();
+                                                        String uriPost = "https://family-connect-ggc-2017.herokuapp.com/users/" + ID + "/usergroup";
+                                                        taskPost.execute(uriPost);
+                                                        GROUP_POST_JOIN = true;
+                                                        POST = false;
+                                                        GROUP_POST = false;
+                                                    }
+                                                }
+                                                else {
+                                                    onSignupFailed();
+                                                }
+
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
                             }
                         },
                         new Response.ErrorListener()
                         {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                onSignupFailed();
+                                Toast.makeText(getBaseContext(), "Sign Up Failed! Please Try Again.", Toast.LENGTH_LONG).show();
+                                finish();
+
                                 Log.d("Error.Response", ""+error);
                             }
                         }
@@ -297,13 +316,8 @@ public class UserSignupActivity extends AppCompatActivity {
                         params.put("password", passwordText.getText().toString());
                         params.put("password_confirmation", confirm_passwordText.getText().toString());
 
-                        if(!isCreateGroup) {
-                            //params.put("group_id", groupIDText.getText().toString());
-                        }
-
                         return params;
                     }
-
                 };
                 queue.add(postRequest);
             }
@@ -317,13 +331,15 @@ public class UserSignupActivity extends AppCompatActivity {
                             public void onResponse(String response) {
 
                                 Log.d("GROUP POST REQUEST", response);
+
+                                Intent signIn = new Intent(UserSignupActivity.this, UserLoginActivity.class);
+                                UserSignupActivity.this.startActivity(signIn);
                             }
                         },
                         new Response.ErrorListener()
                         {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-
                                 Log.d("Error.Response", "" + error);
                             }
                         }
@@ -360,13 +376,15 @@ public class UserSignupActivity extends AppCompatActivity {
                             public void onResponse(String response) {
 
                                 Log.d("GROUP POST REQUEST", response);
+
+                                Intent signIn = new Intent(UserSignupActivity.this, UserLoginActivity.class);
+                                UserSignupActivity.this.startActivity(signIn);
                             }
                         },
                         new Response.ErrorListener()
                         {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-
                                 Log.d("Error.Response", "" + error);
                             }
                         }
@@ -401,10 +419,6 @@ public class UserSignupActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
-            Intent signIn = new Intent(UserSignupActivity.this, UserLoginActivity.class);
-            UserSignupActivity.this.startActivity(signIn);
-
-        }
-
+            }
     }
 }
