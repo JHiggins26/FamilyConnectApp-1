@@ -47,45 +47,20 @@
         android:id="@+id/listText"
         android:layout_width="260dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginTop="12dp"
         android:fontFamily=""
         android:text="Activity"
         android:textAlignment="center"
         android:textColor="#ffffff"
         android:textSize="20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/listBGimage" />
-
-    <TextView
-        android:id="@+id/listCategory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily=""
-        android:text="Category"
-        android:textAlignment="center"
-        android:textColor="#ffffff"
-        android:textSize="15dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listText" />
-
-    <ImageView
-        android:id="@+id/completeCheck"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:visibility="invisible"
-        android:background="@drawable/check_icon"
         app:layout_constraintBottom_toBottomOf="@+id/listBGimage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.88"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/listBGimage" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/listBGimage"
+        app:layout_constraintVertical_bias="0.39999998" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>
