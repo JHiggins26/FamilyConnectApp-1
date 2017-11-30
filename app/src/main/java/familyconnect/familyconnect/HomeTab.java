@@ -530,8 +530,14 @@ public class HomeTab extends Fragment implements View.OnClickListener {
 
                                     if((Double)futureTemperature != null && futureSummary != null && futureIcon != null
                                             && (Double)futureTemperatureHigh != null && (Double)futureTemperatureLow != null) {
-                                        Intent futureSuggestedPage = new Intent(getActivity(), SuggestedFutureActivity.class);
-                                        HomeTab.this.startActivity(futureSuggestedPage);
+
+                                        new android.os.Handler().postDelayed(
+                                                new Runnable() {
+                                                    public void run() {
+                                                        Intent futureSuggestedPage = new Intent(getActivity(), SuggestedFutureActivity.class);
+                                                        HomeTab.this.startActivity(futureSuggestedPage);
+                                                    }
+                                                }, 1200);
                                     }
 
                                 } catch (JSONException e) {
