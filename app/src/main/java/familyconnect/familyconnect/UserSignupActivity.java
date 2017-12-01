@@ -299,7 +299,7 @@ public class UserSignupActivity extends AppCompatActivity {
                         {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(getBaseContext(), "Sign Up Failed! Please Try Again.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(), "Sign Up Failed! The Email is already in use.", Toast.LENGTH_LONG).show();
                                 finish();
 
                                 Log.d("Error.Response", ""+error);
@@ -331,6 +331,8 @@ public class UserSignupActivity extends AppCompatActivity {
                             public void onResponse(String response) {
 
                                 Log.d("GROUP POST REQUEST", response);
+
+                                Toast.makeText(getBaseContext(), "Account Created", Toast.LENGTH_LONG).show();
 
                                 Intent signIn = new Intent(UserSignupActivity.this, UserLoginActivity.class);
                                 UserSignupActivity.this.startActivity(signIn);
@@ -376,6 +378,8 @@ public class UserSignupActivity extends AppCompatActivity {
                             public void onResponse(String response) {
 
                                 Log.d("GROUP POST REQUEST", response);
+
+                                Toast.makeText(getBaseContext(), "Account Created", Toast.LENGTH_LONG).show();
 
                                 Intent signIn = new Intent(UserSignupActivity.this, UserLoginActivity.class);
                                 UserSignupActivity.this.startActivity(signIn);
